@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Delwar Hossain - Full Stack Web Developer Portfolio">
-    <title>Delwar Hossain - Portfolio</title>
+    <meta name="description" content="{{ $content->hero_name }} - Portfolio">
+    <title>{{ $content->hero_name }} - Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,18 +53,14 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <p class="hero-greeting">Hi I'm</p>
-                    <h1 class="hero-name">Delwar Hossain</h1>
-                    <p class="hero-role">I'm a <span class="typed-text" id="typedText"></span><span class="cursor">|</span></p>
-                    <p class="hero-description">
-                        Full Stack Developer with over 5 years of experience in PHP, Laravel, and Vue JS.
-                        I have demonstrated expertise in developing and optimizing web applications.
-                        I am passionate about writing clean and scalable code.
-                    </p>
+                    <p class="hero-greeting">{{ $content->hero_greeting }}</p>
+                    <h1 class="hero-name">{{ $content->hero_name }}</h1>
+                    <p class="hero-role">I'm a <span class="typed-text" id="typedText" data-roles="{{ $content->hero_roles }}"></span><span class="cursor">|</span></p>
+                    <p class="hero-description">{{ $content->hero_description }}</p>
                     <div class="hero-social">
-                        <a href="https://www.linkedin.com/in/delwarhossaindev/" class="social-link" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="https://github.com/delwarhossaindev" class="social-link" title="GitHub" target="_blank"><i class="fab fa-github"></i></a>
-                        <a href="mailto:delwarhossain1103104@gmail.com" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>
+                        <a href="{{ $content->linkedin_url }}" class="social-link" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="{{ $content->github_url }}" class="social-link" title="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="mailto:{{ $content->contact_email }}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>
                     </div>
                     <div class="hero-actions">
                         <a href="#contact" class="btn btn-primary">Hire Me</a>
@@ -74,7 +70,7 @@
                 <div class="hero-image">
                     <div class="image-wrapper">
                         <div class="image-glow"></div>
-                        <img src="{{ asset('images/profile.jpg') }}" alt="Delwar Hossain" class="profile-img">
+                        <img src="{{ asset('images/profile.jpg') }}" alt="{{ $content->hero_name }}" class="profile-img">
                     </div>
                 </div>
             </div>
@@ -86,12 +82,8 @@
         <div class="container">
             <div class="about-grid">
                 <div class="about-content">
-                    <h2 class="section-title">About me</h2>
-                    <p>
-                        I am a Full Stack Developer with over <strong>5 years of experience</strong> in PHP, Laravel,
-                        and Vue JS. I have demonstrated expertise in developing and optimizing web applications.
-                        I am passionate about writing clean and scalable code.
-                    </p>
+                    <h2 class="section-title">{{ $content->about_title }}</h2>
+                    <p>{!! nl2br(e($content->about_description)) !!}</p>
                     <p>
                         I hold a <strong>Bachelor of Science in Computer Science & Engineering</strong> from
                         <strong>Bangladesh Army International University of Science and Technology (BAIUST)</strong>,
@@ -429,28 +421,28 @@
                             <i class="fas fa-envelope"></i>
                             <div>
                                 <span class="contact-label">Email</span>
-                                <a href="mailto:delwarhossain1103104@gmail.com">delwarhossain1103104@gmail.com</a>
+                                <a href="mailto:{{ $content->contact_email }}">{{ $content->contact_email }}</a>
                             </div>
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-phone"></i>
                             <div>
                                 <span class="contact-label">Phone</span>
-                                <a href="tel:+8801797384242">+880 1797-384242</a>
+                                <a href="tel:{{ preg_replace('/\s+/', '', $content->contact_phone) }}">{{ $content->contact_phone }}</a>
                             </div>
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-map-marker-alt"></i>
                             <div>
                                 <span class="contact-label">Location</span>
-                                <span>Mirpur-12, Dhaka, Bangladesh</span>
+                                <span>{{ $content->contact_location }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="contact-social">
-                        <a href="https://www.linkedin.com/in/delwarhossaindev/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="https://github.com/delwarhossaindev" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-                        <a href="mailto:delwarhossain1103104@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+                        <a href="{{ $content->linkedin_url }}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="{{ $content->github_url }}" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="mailto:{{ $content->contact_email }}" title="Email"><i class="fas fa-envelope"></i></a>
                     </div>
                 </div>
 
@@ -498,7 +490,7 @@
     {{-- Footer --}}
     <footer class="footer">
         <div class="container">
-            <p>&copy; {{ date('Y') }} Delwar Hossain. All Rights Reserved.</p>
+            <p>&copy; {{ date('Y') }} {{ $content->hero_name }}. All Rights Reserved.</p>
         </div>
     </footer>
 

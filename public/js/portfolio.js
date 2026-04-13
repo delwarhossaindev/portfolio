@@ -49,37 +49,45 @@ document.addEventListener('mousemove', (e) => {
 
 // ===== Typing Animation =====
 const typedTextElement = document.getElementById('typedText');
-const texts = ['Full Stack Developer', 'Software Engineer', 'Laravel & Vue.js Expert', 'PHP Developer'];
-let textIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
+if (typedTextElement) {
+    const dynamicRoles = (typedTextElement.dataset.roles || '')
+        .split(',')
+        .map(role => role.trim())
+        .filter(role => role.length > 0);
+    const texts = dynamicRoles.length > 0
+        ? dynamicRoles
+        : ['Full Stack Developer', 'Software Engineer', 'Laravel & Vue.js Expert', 'PHP Developer'];
+    let textIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
 
-function typeText() {
-    const currentText = texts[textIndex];
+    function typeText() {
+        const currentText = texts[textIndex];
 
-    if (isDeleting) {
-        typedTextElement.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-    } else {
-        typedTextElement.textContent = currentText.substring(0, charIndex + 1);
-        charIndex++;
+        if (isDeleting) {
+            typedTextElement.textContent = currentText.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            typedTextElement.textContent = currentText.substring(0, charIndex + 1);
+            charIndex++;
+        }
+
+        let speed = isDeleting ? 50 : 100;
+
+        if (!isDeleting && charIndex === currentText.length) {
+            speed = 2000;
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            textIndex = (textIndex + 1) % texts.length;
+            speed = 500;
+        }
+
+        setTimeout(typeText, speed);
     }
 
-    let speed = isDeleting ? 50 : 100;
-
-    if (!isDeleting && charIndex === currentText.length) {
-        speed = 2000;
-        isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        textIndex = (textIndex + 1) % texts.length;
-        speed = 500;
-    }
-
-    setTimeout(typeText, speed);
+    typeText();
 }
-
-typeText();
 
 // ===== Navbar Scroll Effect =====
 const navbar = document.getElementById('navbar');

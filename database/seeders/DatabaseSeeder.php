@@ -19,10 +19,10 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAndPermissionsSeeder::class);
 
         $admin = User::query()->updateOrCreate([
-            'email' => 'admin@portfolio.com',
+            'email' => 'admin@demo.com',
         ], [
             'name' => 'Admin',
-            'password' => Hash::make('admin12345'),
+            'password' => Hash::make('123456'),
         ]);
 
         $admin->syncRoles(['admin']);

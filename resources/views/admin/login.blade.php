@@ -19,8 +19,8 @@
         <div class="card-body">
             <p class="login-box-msg">Login to manage your portfolio content</p>
             <div class="alert alert-info">
-                <strong>Email:</strong> admin@portfolio.com<br>
-                <strong>Password:</strong> admin12345
+                <strong>Email:</strong> admin@demo.com<br>
+                <strong>Password:</strong> 123456
             </div>
 
             <form action="{{ route('admin.login.submit') }}" method="post">

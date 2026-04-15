@@ -1,53 +1,279 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Portfolio Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern, admin-managed portfolio website built with Laravel 11 and Blade templating. This application allows administrators to showcase their professional experience, projects, and manage visitor inquiries through an intuitive dashboard.
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Database Setup](#database-setup)
+- [Admin Credentials](#admin-credentials)
+- [Project Structure](#project-structure)
+- [Key Routes](#key-routes)
+- [Usage](#usage)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Portfolio Showcase**: Display professional experience and projects
+- **Admin Dashboard**: Manage portfolio content, permissions, and users
+- **Role-Based Access Control**: Spatie permissions integration for granular access control
+- **Contact Form**: Visitor inquiries with admin management
+- **User Management**: Add and manage admin users with different roles
+- **Responsive Design**: Mobile-friendly interface
+- **Terminal Panel**: Execute artisan commands directly from the admin panel
+- **SQLite Database**: Default local database setup
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.2 or higher
+- Composer
+- Node.js (for Vite asset compilation)
+- npm or yarn
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Clone the Repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url>
+cd portfolio
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install Dependencies
 
-## Contributing
+```bash
+composer install
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Generate Environment File
 
-## Code of Conduct
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### 5. Create Database and Run Migrations
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+This will create the SQLite database and seed it with initial roles, permissions, and admin user.
+
+### 6. Create Storage Link
+
+```bash
+php artisan storage:link
+```
+
+Or visit `http://localhost/storage-link` in your browser.
+
+### 7. Build Frontend Assets
+
+```bash
+npm run build
+```
+
+For development with hot reload:
+
+```bash
+npm run dev
+```
+
+## Configuration
+
+### Environment Variables
+
+Key configuration in `.env`:
+
+```env
+APP_NAME=Laravel
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=sqlite
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+```
+
+### Database
+
+The application uses SQLite by default. The database file is located at `database/database.sqlite`.
+
+## Database Setup
+
+The project includes database migrations and seeders:
+
+- **Migrations**: Create all necessary tables (users, contacts, experiences, projects, etc.)
+- **Seeders**: 
+  - `RolesAndPermissionsSeeder`: Creates admin, user roles and associated permissions
+  - `DatabaseSeeder`: Creates initial admin user
+
+### Run Migrations
+
+```bash
+php artisan migrate
+```
+
+### Seed Database
+
+```bash
+php artisan db:seed
+```
+
+### Fresh Migration with Seeding
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+## Admin Credentials
+
+Default admin user created during seeding:
+
+- **Email**: `admin@demo.com`
+- **Password**: `123456`
+
+> **Note**: Change these credentials immediately after first login in a production environment.
+
+## Project Structure
+
+```
+portfolio/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/          # Application controllers
+│   │   │   ├── AdminAuthController.php
+│   │   │   ├── PortfolioController.php
+│   │   │   ├── ExperienceController.php
+│   │   │   ├── ProjectController.php
+│   │   │   └── ...
+│   ├── Models/                   # Eloquent models
+│   │   ├── User.php
+│   │   ├── Contact.php
+│   │   ├── Experience.php
+│   │   ├── Project.php
+│   │   └── PortfolioContent.php
+│   └── Providers/                # Service providers
+├── database/
+│   ├── migrations/               # Database schema migrations
+│   ├── seeders/                  # Database seeders
+│   └── factories/                # Model factories for testing
+├── resources/
+│   ├── views/                    # Blade templates
+│   │   ├── portfolio.blade.php   # Public portfolio page
+│   │   ├── terminal-panel.blade.php
+│   │   ├── welcome.blade.php
+│   │   └── admin/                # Admin panel views
+│   ├── css/                      # Stylesheets
+│   └── js/                       # JavaScript assets
+├── routes/
+│   └── web.php                   # Web routes
+├── config/                       # Configuration files
+└── storage/                      # File storage (logs, uploads, etc.)
+```
+
+## Key Routes
+
+### Public Routes
+
+- `GET /` - Home page (portfolio showcase)
+- `POST /contact` - Submit contact form
+
+### Admin Routes
+
+- `GET /admin/login` - Admin login page
+- `POST /admin/login` - Login submission
+- `GET /admin/dashboard` - Admin dashboard (requires authentication)
+
+### Admin Authenticated Routes (Protected)
+
+- `POST /admin/logout` - Logout
+- `GET /admin/home` - Edit home/portfolio content
+- `PUT /admin/home` - Update portfolio content
+- `GET /admin/experiences` - List experiences
+- `GET /admin/experiences/create` - Create experience
+- `POST /admin/experiences` - Store experience
+- `GET /admin/experiences/{id}/edit` - Edit experience
+- `PUT /admin/experiences/{id}` - Update experience
+- `DELETE /admin/experiences/{id}` - Delete experience
+
+Similar RESTful routes exist for:
+- `/admin/projects` - Project management
+- `/admin/contacts` - Manage contact inquiries
+- `/admin/users` - Manage users
+- `/admin/roles` - Manage roles
+- `/admin/permissions` - Manage permissions
+
+### Utility Routes
+
+- `GET /storage-link` - Create storage symlink
+- `GET /migrate` - Run database migrations (force)
+
+## Usage
+
+### Accessing the Application
+
+1. **Public Portfolio**: Visit `http://localhost` to see the portfolio
+2. **Admin Panel**: Visit `http://localhost/admin/login`
+3. **Login**: Use credentials:
+   - Email: `admin@demo.com`
+   - Password: `123456`
+
+### Managing Content
+
+In the admin dashboard, you can:
+
+- **Edit Portfolio**: Update home page content and profile information
+- **Manage Experiences**: Add, edit, or delete work experience entries
+- **Manage Projects**: Showcase your projects with descriptions and links
+- **View Contacts**: See messages from visitors through the contact form
+- **User Management**: Add or remove admin users
+- **Roles & Permissions**: Configure access levels for different users
+
+### Running Commands
+
+Access the Terminal Panel (`/terminal-panel`) to execute artisan commands directly through the web interface.
+
+## Development Workflow
+
+### Build Assets
+
+```bash
+# Development build with hot reload
+npm run dev
+
+# Production build
+npm run build
+```
+
+### Run Local Server
+
+```bash
+php artisan serve
+```
+
+Then visit `http://localhost:8000`
+
+### Run Tests
+
+```bash
+php artisan test
+```
+
+## License
+
+This project is open-sourced software licensed under the MIT license.
 
 ## Security Vulnerabilities
 

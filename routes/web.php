@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\ProjectController;
 
 Route::get('/', [PortfolioController::class, 'index']);
 Route::post('/contact', [PortfolioController::class, 'contact'])->name('contact.store');
@@ -16,6 +19,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
     Route::get('/terminal-panel', [PortfolioController::class, 'terminalPanel'])->name('terminal.panel');
     Route::post('/terminal-panel/run', [PortfolioController::class, 'runTerminalCommand'])->name('terminal.run');
-    Route::get('/admin/dashboard', [PortfolioController::class, 'adminDashboard'])->name('admin.dashboard');
-    Route::post('/admin/dashboard', [PortfolioController::class, 'updateAdminDashboard'])->name('admin.dashboard.update');
+    Route::get('/admin/dashboard', [PortfolioController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/home', [PortfolioController::class, 'homeEdit'])->name('admin.home.edit');
+    Route::put('/admin/home', [PortfolioController::class, 'homeUpdate'])->name('admin.home.update');
+
+    Route::resource('admin/experiences', ExperienceController::class)
+        ->except(['show'])
+        ->names('admin.experiences');
+
+    Route::resource('admin/projects', ProjectController::class)
+        ->except(['show'])
+        ->names('admin.projects');
+
+    Route::get('/admin/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
+    Route::get('/admin/contacts/{contact}', [ContactController::class, 'show'])->name('admin.contacts.show');
+    Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
 });

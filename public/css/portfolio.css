@@ -192,6 +192,42 @@ img {
     width: 100%;
 }
 
+.nav-links .nav-signin {
+    padding: 6px 14px;
+    border: 1px solid var(--text-secondary);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.nav-links .nav-signin:hover {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+}
+
+.nav-links .nav-signin::after {
+    display: none;
+}
+
+.nav-links .nav-signin-btn {
+    background: transparent;
+    border: 1px solid var(--text-secondary);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.nav-links .nav-signin-btn:hover {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+}
+
 .nav-right {
     display: flex;
     align-items: center;

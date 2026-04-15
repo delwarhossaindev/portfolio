@@ -31,6 +31,17 @@
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#contact">Contact</a></li>
+                @auth
+                    <li><a href="{{ route('admin.dashboard') }}"><i class="fas fa-gauge"></i> Dashboard</a></li>
+                    <li>
+                        <form method="POST" action="{{ route('admin.logout') }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="nav-signin-btn"><i class="fas fa-right-from-bracket"></i> Logout</button>
+                        </form>
+                    </li>
+                @else
+                    <li><a href="{{ route('admin.login') }}" class="nav-signin"><i class="fas fa-right-to-bracket"></i> Sign In</a></li>
+                @endauth
             </ul>
             <div class="nav-right">
                 <div class="theme-switch" id="themeSwitch" title="Toggle Light/Dark Mode">
@@ -168,102 +179,33 @@
         <div class="container">
             <h2 class="section-title section-title-center">Work Experience</h2>
             <div class="timeline">
-                {{-- 1. ACI Limited --}}
-                <div class="timeline-item">
-                    <div class="timeline-dot">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h3>Software Engineer</h3>
-                        <span class="timeline-company">ACI Limited</span>
-                        <span class="timeline-location"><i class="fas fa-map-marker-alt"></i> ACI Centre 245, Tejgaon Industrial Area, Dhaka-1208</span>
-                        <span class="timeline-date">March 2024 - Present (1.7 yrs)</span>
-                        <p>Writing clean and efficient code in PHP (Laravel). Troubleshooting, testing, and maintaining applications and databases. Taking ownership & full responsibility for projects. Building effective REST APIs with extendable, manageable, and secured code.</p>
-                        <div class="timeline-tech">
-                            <span>Laravel</span>
-                            <span>Vue.js</span>
-                            <span>REST API</span>
+                @foreach($experiences as $exp)
+                    <div class="timeline-item">
+                        <div class="timeline-dot">
+                            <i class="{{ $exp->icon ?: 'fas fa-briefcase' }}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h3>{{ $exp->role }}</h3>
+                            <span class="timeline-company">{{ $exp->company }}</span>
+                            @if($exp->location)
+                                <span class="timeline-location"><i class="fas fa-map-marker-alt"></i> {{ $exp->location }}</span>
+                            @endif
+                            @if($exp->date_range)
+                                <span class="timeline-date">{{ $exp->date_range }}</span>
+                            @endif
+                            @if($exp->description)
+                                <p>{{ $exp->description }}</p>
+                            @endif
+                            @if(count($exp->techList()))
+                                <div class="timeline-tech">
+                                    @foreach($exp->techList() as $tech)
+                                        <span>{{ $tech }}</span>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
-                </div>
-
-                {{-- 2. MBM Group --}}
-                <div class="timeline-item">
-                    <div class="timeline-dot">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h3>Software Engineer</h3>
-                        <span class="timeline-company">MBM Group</span>
-                        <span class="timeline-location"><i class="fas fa-map-marker-alt"></i> Mirpur DOHS, Dhaka</span>
-                        <span class="timeline-date">June 2022 - February 2024 (1.7 yrs)</span>
-                        <p>Worked on Merchandising, Commercial, Store, Industrial Engineering (IE), and Purchase modules. Ensured extendable, manageable, and secured code. Used version control, debug tools, and monitoring processes.</p>
-                        <div class="timeline-tech">
-                            <span>Laravel</span>
-                            <span>Vue.js</span>
-                            <span>MySQL</span>
-                            <span>Oracle</span>
-                            <span>GitHub</span>
-                            <span>Trello</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- 3. Ringer Soft Limited --}}
-                <div class="timeline-item">
-                    <div class="timeline-dot">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h3>Software Engineer</h3>
-                        <span class="timeline-company">Ringer Soft Limited</span>
-                        <span class="timeline-location"><i class="fas fa-map-marker-alt"></i> Chittagong</span>
-                        <span class="timeline-date">October 2020 - May 2022 (1.6 yrs)</span>
-                        <p>Took ownership of back-end development and front-end on multiple projects. Worked on HR & Payroll, Inventory, POS, and School Management System. Handled project requirement analysis and client discussions.</p>
-                        <div class="timeline-tech">
-                            <span>Laravel</span>
-                            <span>JavaScript</span>
-                            <span>jQuery</span>
-                            <span>MySQL</span>
-                            <span>SSLCOMMERZ</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- 4. ICT Wing (BAIUST) --}}
-                <div class="timeline-item">
-                    <div class="timeline-dot">
-                        <i class="fas fa-laptop-code"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h3>Jr. Software Engineer</h3>
-                        <span class="timeline-company">ICT Wing (BAIUST)</span>
-                        <span class="timeline-location"><i class="fas fa-map-marker-alt"></i> Cumilla Cantonment</span>
-                        <span class="timeline-date">January 2020 - September 2020 (0.7 yr)</span>
-                        <p>Worked on Online Exam Registration System (Admission, Semester & Referred Exam) and Online Based Android Application. Collaborated with development teams and product managers.</p>
-                        <div class="timeline-tech">
-                            <span>PHP</span>
-                            <span>Laravel</span>
-                            <span>JavaScript</span>
-                            <span>jQuery</span>
-                            <span>MySQL</span>
-                            <span>Java</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Education --}}
-                <div class="timeline-item">
-                    <div class="timeline-dot">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h3>BSc in Computer Science & Engineering</h3>
-                        <span class="timeline-company">Bangladesh Army International University of Science and Technology (BAIUST)</span>
-                        <span class="timeline-date">Graduated 2020 | 4 Years | 161 Credits</span>
-                        <p>Completed Bachelor of Science degree in Computer Science & Engineering with a strong foundation in software development, algorithms, data structures, and engineering principles.</p>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -273,136 +215,29 @@
         <div class="container">
             <h2 class="section-title section-title-center">Projects</h2>
             <div class="projects-grid">
-                {{-- ACI Limited Projects --}}
-                <div class="project-card featured">
-                    <div class="project-header">
-                        <i class="fas fa-building project-icon"></i>
-                        <div class="project-links">
-                            <span class="project-company-badge">ACI Limited</span>
+                @foreach($projects as $project)
+                    <div class="project-card {{ $project->is_featured ? 'featured' : '' }}">
+                        <div class="project-header">
+                            <i class="{{ $project->icon ?: 'fas fa-folder-open' }} project-icon"></i>
+                            @if($project->company_badge)
+                                <div class="project-links">
+                                    <span class="project-company-badge">{{ $project->company_badge }}</span>
+                                </div>
+                            @endif
                         </div>
+                        <h3 class="project-title">{{ $project->title }}</h3>
+                        @if($project->description)
+                            <p class="project-description">{{ $project->description }}</p>
+                        @endif
+                        @if(count($project->techList()))
+                            <div class="project-tech">
+                                @foreach($project->techList() as $tech)
+                                    <span>{{ $tech }}</span>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
-                    <h3 class="project-title">Enterprise Web Application</h3>
-                    <p class="project-description">
-                        Full-scale enterprise application at ACI Limited. Writing clean and efficient code,
-                        troubleshooting and maintaining applications and databases. Building effective REST APIs
-                        with extendable, manageable, and secured architecture.
-                    </p>
-                    <div class="project-tech">
-                        <span>Laravel</span>
-                        <span>Vue.js</span>
-                        <span>REST API</span>
-                        <span>MySQL</span>
-                    </div>
-                </div>
-
-                {{-- MBM Group ERP --}}
-                <div class="project-card featured">
-                    <div class="project-header">
-                        <i class="fas fa-industry project-icon"></i>
-                        <div class="project-links">
-                            <span class="project-company-badge">MBM Group</span>
-                        </div>
-                    </div>
-                    <h3 class="project-title">ERP System - Merchandising, Commercial, Store, IE & Purchase</h3>
-                    <p class="project-description">
-                        Comprehensive ERP solution covering Merchandising, Commercial, Store, Industrial Engineering (IE),
-                        and Purchase modules. Built with version control, debug tools, and monitoring processes
-                        for enterprise-level operations.
-                    </p>
-                    <div class="project-tech">
-                        <span>Laravel</span>
-                        <span>Vue.js</span>
-                        <span>MySQL</span>
-                        <span>Oracle</span>
-                        <span>Trello</span>
-                    </div>
-                </div>
-
-                {{-- Ringer Soft Projects --}}
-                <div class="project-card">
-                    <div class="project-header">
-                        <i class="fas fa-folder-open project-icon"></i>
-                        <div class="project-links">
-                            <span class="project-company-badge">Ringer Soft</span>
-                        </div>
-                    </div>
-                    <h3 class="project-title">HR & Payroll, Inventory, POS System</h3>
-                    <p class="project-description">
-                        Multiple enterprise solutions including HR & Payroll management, Inventory tracking system,
-                        and Point of Sale (POS) system. Handled requirement analysis, client discussions, and project deadline management.
-                    </p>
-                    <div class="project-tech">
-                        <span>Laravel</span>
-                        <span>JavaScript</span>
-                        <span>jQuery</span>
-                        <span>MySQL</span>
-                        <span>SSLCOMMERZ</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <i class="fas fa-school project-icon"></i>
-                        <div class="project-links">
-                            <span class="project-company-badge">Ringer Soft</span>
-                        </div>
-                    </div>
-                    <h3 class="project-title">School Management System</h3>
-                    <p class="project-description">
-                        Complete school management solution with student enrollment, attendance tracking,
-                        grade management, and administrative tools. Full back-end and front-end ownership
-                        with clear, well-documented code.
-                    </p>
-                    <div class="project-tech">
-                        <span>Laravel</span>
-                        <span>JavaScript</span>
-                        <span>jQuery</span>
-                        <span>MySQL</span>
-                    </div>
-                </div>
-
-                {{-- BAIUST Projects --}}
-                <div class="project-card">
-                    <div class="project-header">
-                        <i class="fas fa-laptop-code project-icon"></i>
-                        <div class="project-links">
-                            <span class="project-company-badge">BAIUST</span>
-                        </div>
-                    </div>
-                    <h3 class="project-title">Online Exam Registration System</h3>
-                    <p class="project-description">
-                        Online Exam Registration System handling Admission, Semester & Referred Exam registrations.
-                        Designed for Cumilla Cantonment's ICT Wing with efficient data management and user-friendly interface.
-                    </p>
-                    <div class="project-tech">
-                        <span>PHP</span>
-                        <span>Laravel</span>
-                        <span>JavaScript</span>
-                        <span>jQuery</span>
-                        <span>MySQL</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <i class="fas fa-mobile-alt project-icon"></i>
-                        <div class="project-links">
-                            <span class="project-company-badge">BAIUST</span>
-                        </div>
-                    </div>
-                    <h3 class="project-title">Online Based Android Application</h3>
-                    <p class="project-description">
-                        Android-based mobile application developed for BAIUST ICT Wing.
-                        Built with Java and integrated with web backend for seamless data synchronization
-                        and user experience.
-                    </p>
-                    <div class="project-tech">
-                        <span>Java</span>
-                        <span>PHP</span>
-                        <span>MySQL</span>
-                        <span>Android</span>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>

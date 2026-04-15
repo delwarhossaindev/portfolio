@@ -19,6 +19,11 @@ Route::get('/storage-link', function () {
     return 'Storage link created: ' . Artisan::output();
 });
 
+Route::get('/migrate', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
     Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');

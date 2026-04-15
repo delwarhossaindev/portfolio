@@ -10,17 +10,24 @@
 <body class="hold-transition login-page dark-mode">
 <div class="login-box">
     <div class="login-logo">
-        <b>Portfolio</b> Admin
+        <a href="#">
+            <i class="fas fa-briefcase"></i>
+            <b>Portfolio</b> Admin
+        </a>
     </div>
     <div class="card card-outline card-primary">
         <div class="card-header text-center">
-            <span class="h1">Sign In</span>
+            <i class="fas fa-sign-in-alt"></i>
+            <span class="h4 ml-2">Sign In</span>
         </div>
         <div class="card-body">
-            <p class="login-box-msg">Login to manage your portfolio content</p>
+            <p class="login-box-msg">
+                <i class="fas fa-lock-open"></i>
+                Login to manage your portfolio content
+            </p>
             <div class="alert alert-info">
-                <strong>Email:</strong> admin@demo.com<br>
-                <strong>Password:</strong> 123456
+                <strong><i class="fas fa-user-circle"></i> Email:</strong> admin@demo.com<br>
+                <strong><i class="fas fa-key"></i> Password:</strong> 123456
             </div>
 
             <form action="{{ route('admin.login.submit') }}" method="post">
@@ -42,7 +49,9 @@
 
                 <div class="row">
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-login"></i> Sign In
+                        </button>
                     </div>
                 </div>
             </form>

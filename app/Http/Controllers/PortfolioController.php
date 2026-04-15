@@ -8,6 +8,7 @@ use App\Models\Experience;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Storage;
 
 class PortfolioController extends Controller
 {
@@ -285,15 +286,26 @@ class PortfolioController extends Controller
             'contact_location' => 'required|string|max:255',
             'linkedin_url' => 'nullable|url|max:255',
             'github_url' => 'nullable|url|max:255',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:4096',
+            'remove_profile_image' => 'nullable|boolean',
         ]);
 
-        $content = PortfolioContent::query()->first();
+        $content = PortfolioContent::query()->firstOrNew([]);
 
-        if (! $content) {
-            PortfolioContent::query()->create($validated);
-        } else {
-            $content->update($validated);
+        if ($request->boolean('remove_profile_image') && $content->profile_image) {
+            Storage::disk('public')->delete($content->profile_image);
+            $content->profile_image = null;
         }
+
+        if ($request->hasFile('profile_image')) {
+            if ($content->profile_image) {
+                Storage::disk('public')->delete($content->profile_image);
+            }
+            $content->profile_image = $request->file('profile_image')->store('portfolio', 'public');
+        }
+
+        $content->fill(collect($validated)->except(['profile_image', 'remove_profile_image'])->toArray());
+        $content->save();
 
         return back()->with('admin_success', 'Portfolio content updated successfully.');
     }

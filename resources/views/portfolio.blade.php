@@ -176,7 +176,7 @@
                 <div class="hero-image">
                     <div class="image-wrapper">
                         <div class="image-glow"></div>
-                        <img src="{{ asset('images/profile.jpg') }}" alt="{{ $content->hero_name }}" class="profile-img">
+                        <img src="{{ $content->profile_image ? asset('storage/' . $content->profile_image) : asset('images/profile.jpg') }}" alt="{{ $content->hero_name }}" class="profile-img">
                     </div>
                 </div>
             </div>

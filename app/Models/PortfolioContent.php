@@ -11,6 +11,7 @@ class PortfolioContent extends Model
         'hero_name',
         'hero_roles',
         'hero_description',
+        'profile_image',
         'about_title',
         'about_description',
         'contact_email',

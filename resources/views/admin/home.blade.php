@@ -8,7 +8,7 @@
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-house-user mr-1"></i> Home Section (Hero / About / Contact Info)</h3>
         </div>
-        <form method="POST" action="{{ route('admin.home.update') }}">
+        <form method="POST" action="{{ route('admin.home.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="card-body">
@@ -38,6 +38,32 @@
                         <div class="form-group">
                             <label><i class="fas fa-align-left mr-1"></i> Hero Description</label>
                             <textarea name="hero_description" rows="4" class="form-control" required>{{ old('hero_description', $content->hero_description) }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-image mr-1"></i> Profile Image</label>
+                            @php
+                                $currentImage = $content->profile_image
+                                    ? asset('storage/' . $content->profile_image)
+                                    : asset('images/profile.jpg');
+                            @endphp
+                            <div class="d-flex align-items-center" style="gap:18px; flex-wrap:wrap">
+                                <div style="width:110px; height:110px; border-radius:50%; overflow:hidden; border:3px solid rgba(99,102,241,0.45); box-shadow:0 6px 18px rgba(79,70,229,0.35); background:#1f2937">
+                                    <img id="profile-image-preview" src="{{ $currentImage }}" alt="Profile preview" style="width:100%; height:100%; object-fit:cover">
+                                </div>
+                                <div style="flex:1; min-width:240px">
+                                    <input type="file" name="profile_image" id="profile_image" accept="image/*" class="form-control-file" onchange="(function(inp){var f=inp.files&&inp.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(e){document.getElementById('profile-image-preview').src=e.target.result;}; r.readAsDataURL(f);})(this)">
+                                    <small class="form-text text-muted">JPG, PNG, WEBP or GIF. Max 4 MB. Leave empty to keep the current image.</small>
+                                    @if($content->profile_image)
+                                        <div class="custom-control custom-checkbox mt-2">
+                                            <input type="checkbox" class="custom-control-input" id="remove_profile_image" name="remove_profile_image" value="1">
+                                            <label class="custom-control-label text-danger" for="remove_profile_image">
+                                                <i class="fas fa-trash-can mr-1"></i>Remove uploaded image (revert to default)
+                                            </label>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

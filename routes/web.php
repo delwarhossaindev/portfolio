@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\ContactController;
@@ -12,6 +13,11 @@ use App\Http\Controllers\UserController;
 
 Route::get('/', [PortfolioController::class, 'index']);
 Route::post('/contact', [PortfolioController::class, 'contact'])->name('contact.store');
+
+Route::get('/storage-link', function () {
+    Artisan::call('storage:link');
+    return 'Storage link created: ' . Artisan::output();
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');

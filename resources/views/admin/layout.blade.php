@@ -253,10 +253,329 @@
             background: linear-gradient(90deg, #4f46e5, #9333ea);
             border-color: #6366f1;
         }
+
+        #theme-toggle {
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #e5e7eb;
+            border-radius: 999px;
+            padding: 4px 12px;
+            transition: all 0.25s ease;
+        }
+        #theme-toggle:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+        #theme-toggle .fa-sun { display: none; }
+        #theme-toggle .fa-moon { display: inline-block; }
+
+        body.theme-light #theme-toggle {
+            border-color: rgba(0,0,0,0.15);
+            color: #1f2937;
+        }
+        body.theme-light #theme-toggle:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        body.theme-light #theme-toggle .fa-sun { display: inline-block; }
+        body.theme-light #theme-toggle .fa-moon { display: none; }
+
+        body.theme-light {
+            background: #f1f5f9 !important;
+            color: #1f2937;
+        }
+        body.theme-light .main-header {
+            background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%) !important;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        body.theme-light .main-header .nav-link {
+            color: #374151 !important;
+        }
+        body.theme-light .main-header .nav-link:hover {
+            color: #4f46e5 !important;
+        }
+        body.theme-light .main-header #admin-clock {
+            color: #64748b !important;
+        }
+        body.theme-light .main-header .btn-outline-light {
+            color: #4f46e5 !important;
+            border-color: #4f46e5 !important;
+        }
+        body.theme-light .main-header .btn-outline-light:hover {
+            background: #ef4444 !important;
+            color: #fff !important;
+            border-color: #ef4444 !important;
+        }
+        body.theme-light .content-wrapper {
+            background: #f1f5f9 !important;
+        }
+        body.theme-light .content-header h1 {
+            color: #111827;
+        }
+        body.theme-light .card {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        body.theme-light .card:hover {
+            box-shadow: 0 10px 28px rgba(15,23,42,0.12);
+        }
+        body.theme-light .card-header {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e5e7eb;
+            color: #111827;
+        }
+        body.theme-light .card-footer {
+            background: #f9fafb !important;
+            border-top: 1px solid #e5e7eb;
+        }
+        body.theme-light .table.table-dark {
+            color: #1f2937 !important;
+            background: #ffffff !important;
+        }
+        body.theme-light .table.table-dark thead th,
+        body.theme-light .table.table-dark tbody td {
+            background: #ffffff !important;
+            border-color: #e5e7eb !important;
+            color: #1f2937 !important;
+        }
+        body.theme-light .table.table-dark thead th {
+            background: #f8fafc !important;
+            color: #334155 !important;
+        }
+        body.theme-light .table.table-dark tbody tr:hover td {
+            background: rgba(79, 70, 229, 0.06) !important;
+        }
+        body.theme-light .form-control {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+            border-color: #d1d5db !important;
+        }
+        body.theme-light .form-control:focus {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+        }
+        body.theme-light label { color: #374151; }
+        body.theme-light .main-footer {
+            background: #ffffff !important;
+            color: #64748b !important;
+            border-top: 1px solid #e5e7eb;
+        }
+        body.theme-light .text-muted { color: #64748b !important; }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 0;
+        }
+        .admin-table thead th {
+            background: linear-gradient(90deg, rgba(79,70,229,0.18), rgba(147,51,234,0.12)) !important;
+            color: #c7d2fe !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            padding: 14px 16px !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+        }
+        .admin-table tbody td {
+            padding: 16px !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+            vertical-align: middle !important;
+            background: transparent !important;
+            color: #e5e7eb;
+        }
+        .admin-table tbody tr {
+            transition: background 0.25s ease, transform 0.25s ease;
+        }
+        .admin-table tbody tr:hover td {
+            background: linear-gradient(90deg, rgba(79,70,229,0.10), rgba(236,72,153,0.04)) !important;
+        }
+        .admin-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        .row-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(79,70,229,0.35);
+        }
+        .avatar-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            margin-right: 10px;
+            box-shadow: 0 4px 10px rgba(99,102,241,0.3);
+        }
+        .user-cell {
+            display: flex;
+            align-items: center;
+        }
+        .user-meta { line-height: 1.2; }
+        .user-meta .user-name { font-weight: 600; color: inherit; }
+        .user-meta .user-sub { font-size: 12px; color: #94a3b8; }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 11px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin: 2px 3px 2px 0;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pill:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .pill-role {
+            background: linear-gradient(135deg, rgba(79,70,229,0.25), rgba(147,51,234,0.25));
+            color: #c7d2fe;
+            border-color: rgba(99,102,241,0.45);
+        }
+        .pill-perm {
+            background: linear-gradient(135deg, rgba(14,165,233,0.22), rgba(6,182,212,0.22));
+            color: #a5f3fc;
+            border-color: rgba(14,165,233,0.45);
+        }
+        .pill-muted {
+            background: rgba(100,116,139,0.2);
+            color: #94a3b8;
+            border-color: rgba(100,116,139,0.35);
+        }
+        .pill-success {
+            background: linear-gradient(135deg, rgba(34,197,94,0.22), rgba(16,185,129,0.22));
+            color: #86efac;
+            border-color: rgba(34,197,94,0.45);
+        }
+        .pill-warning {
+            background: linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.22));
+            color: #fcd34d;
+            border-color: rgba(245,158,11,0.45);
+        }
+        .pill-danger {
+            background: linear-gradient(135deg, rgba(239,68,68,0.22), rgba(220,38,38,0.22));
+            color: #fca5a5;
+            border-color: rgba(239,68,68,0.45);
+        }
+
+        .order-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 6px;
+            background: rgba(148,163,184,0.18);
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .action-group { display: inline-flex; gap: 6px; }
+        .action-group .btn {
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+        }
+        .action-group .btn-edit {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: #fff;
+        }
+        .action-group .btn-delete {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+        .action-group .btn-view {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+        .action-group .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .empty-state {
+            padding: 56px 20px !important;
+            text-align: center;
+            color: #94a3b8;
+        }
+        .empty-state i {
+            font-size: 42px;
+            opacity: 0.35;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        body.theme-light .admin-table thead th {
+            background: linear-gradient(90deg, rgba(79,70,229,0.10), rgba(147,51,234,0.06)) !important;
+            color: #4f46e5 !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+        body.theme-light .admin-table tbody td {
+            color: #1f2937;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        body.theme-light .admin-table tbody tr:hover td {
+            background: linear-gradient(90deg, rgba(79,70,229,0.06), rgba(236,72,153,0.03)) !important;
+        }
+        body.theme-light .user-meta .user-sub { color: #64748b; }
+        body.theme-light .pill-role {
+            background: linear-gradient(135deg, rgba(79,70,229,0.15), rgba(147,51,234,0.15));
+            color: #4f46e5;
+            border-color: rgba(99,102,241,0.3);
+        }
+        body.theme-light .pill-perm {
+            background: linear-gradient(135deg, rgba(14,165,233,0.12), rgba(6,182,212,0.12));
+            color: #0369a1;
+            border-color: rgba(14,165,233,0.3);
+        }
+        body.theme-light .pill-muted {
+            background: #f1f5f9;
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+        body.theme-light .pill-success {
+            background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(16,185,129,0.12));
+            color: #15803d;
+            border-color: rgba(34,197,94,0.3);
+        }
+        body.theme-light .pill-warning {
+            background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.15));
+            color: #b45309;
+            border-color: rgba(245,158,11,0.3);
+        }
+        body.theme-light .pill-danger {
+            background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(220,38,38,0.12));
+            color: #b91c1c;
+            border-color: rgba(239,68,68,0.3);
+        }
+        body.theme-light .order-chip {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        body.theme-light .empty-state { color: #64748b; }
     </style>
     @stack('styles')
 </head>
-<body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed">
+@php $adminTheme = request()->cookie('admin_theme') === 'light' ? 'light' : 'dark'; @endphp
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed {{ $adminTheme === 'light' ? 'theme-light' : 'dark-mode' }}">
 <div class="wrapper">
     <nav class="main-header navbar navbar-expand navbar-dark">
         <ul class="navbar-nav">
@@ -273,6 +592,12 @@
             <li class="nav-item d-none d-sm-inline-block mr-2" style="color:#9fb0d1; font-size:13px; margin-top:12px">
                 <i class="far fa-clock mr-1"></i> <span id="admin-clock"></span>
             </li>
+            <li class="nav-item mr-2">
+                <button type="button" id="theme-toggle" class="mt-1" title="Toggle theme" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+            </li>
             <li class="nav-item">
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
@@ -284,7 +609,7 @@
         </ul>
     </nav>
 
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <aside id="admin-sidebar" class="main-sidebar elevation-4 {{ $adminTheme === 'light' ? 'sidebar-light-primary' : 'sidebar-dark-primary' }}">
         <a href="{{ route('admin.dashboard') }}" class="brand-link">
             <i class="fas fa-rocket mr-2" style="color:#fff"></i>
             <span class="brand-text font-weight-light">Portfolio Admin</span>
@@ -321,6 +646,38 @@
                             <i class="nav-icon fas fa-envelope-open-text"></i>
                             <p>Contact Messages</p>
                         </a>
+                    </li>
+                    @php
+                        $userMgmtOpen = request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.permissions.*');
+                    @endphp
+                    <li class="nav-item has-treeview {{ $userMgmtOpen ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $userMgmtOpen ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-users-gear"></i>
+                            <p>
+                                User Management
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Users</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Roles</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.permissions.index') }}" class="nav-link {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Permissions</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('terminal.panel') }}" class="nav-link {{ request()->routeIs('terminal.*') ? 'active' : '' }}">
@@ -381,6 +738,27 @@
         }
         tick();
         setInterval(tick, 1000);
+    })();
+
+    (function () {
+        const body = document.body;
+        const sidebar = document.getElementById('admin-sidebar');
+        const btn = document.getElementById('theme-toggle');
+        if (!btn) return;
+
+        btn.addEventListener('click', function () {
+            const goLight = !body.classList.contains('theme-light');
+            if (goLight) {
+                body.classList.remove('dark-mode');
+                body.classList.add('theme-light');
+                sidebar && sidebar.classList.replace('sidebar-dark-primary', 'sidebar-light-primary');
+            } else {
+                body.classList.add('dark-mode');
+                body.classList.remove('theme-light');
+                sidebar && sidebar.classList.replace('sidebar-light-primary', 'sidebar-dark-primary');
+            }
+            document.cookie = 'admin_theme=' + (goLight ? 'light' : 'dark') + '; path=/; max-age=31536000; SameSite=Lax';
+        });
     })();
 </script>
 @stack('scripts')

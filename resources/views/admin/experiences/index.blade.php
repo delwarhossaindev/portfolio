@@ -12,50 +12,62 @@
             </a>
         </div>
         <div class="card-body p-0">
-            <table class="table table-dark table-hover mb-0">
+            <table class="admin-table">
                 <thead>
                     <tr>
-                        <th style="width:60px">#</th>
-                        <th><i class="fas fa-user-tie mr-1"></i> Role</th>
+                        <th style="width:70px">#</th>
+                        <th style="width:320px"><i class="fas fa-user-tie mr-1"></i> Role</th>
                         <th><i class="fas fa-building mr-1"></i> Company</th>
-                        <th><i class="far fa-calendar mr-1"></i> Date</th>
-                        <th style="width:80px"><i class="fas fa-sort mr-1"></i> Order</th>
-                        <th style="width:80px">Active</th>
-                        <th style="width:170px">Actions</th>
+                        <th style="width:200px"><i class="far fa-calendar mr-1"></i> Date</th>
+                        <th style="width:80px">Order</th>
+                        <th style="width:110px">Status</th>
+                        <th style="width:180px; text-align:right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($items as $item)
                         <tr>
-                            <td><span class="badge badge-secondary">{{ $item->id }}</span></td>
-                            <td><i class="{{ $item->icon ?: 'fas fa-briefcase' }} mr-1 text-info"></i> {{ $item->role }}</td>
+                            <td><span class="row-index">{{ $item->id }}</span></td>
+                            <td>
+                                <div class="user-cell">
+                                    <span class="avatar-circle" style="background: linear-gradient(135deg,#0ea5e9,#6366f1)">
+                                        <i class="{{ $item->icon ?: 'fas fa-briefcase' }}"></i>
+                                    </span>
+                                    <div class="user-meta">
+                                        <div class="user-name">{{ $item->role }}</div>
+                                        <div class="user-sub">{{ $item->location ?: '—' }}</div>
+                                    </div>
+                                </div>
+                            </td>
                             <td>{{ $item->company }}</td>
                             <td>{{ $item->date_range }}</td>
-                            <td>{{ $item->sort_order }}</td>
+                            <td><span class="order-chip">{{ $item->sort_order }}</span></td>
                             <td>
                                 @if($item->is_active)
-                                    <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Yes</span>
+                                    <span class="pill pill-success"><i class="fas fa-check mr-1"></i>Active</span>
                                 @else
-                                    <span class="badge badge-secondary"><i class="fas fa-times mr-1"></i>No</span>
+                                    <span class="pill pill-muted"><i class="fas fa-times mr-1"></i>Hidden</span>
                                 @endif
                             </td>
-                            <td>
-                                <a href="{{ route('admin.experiences.edit', $item) }}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-pen-to-square"></i> Edit
-                                </a>
-                                <form method="POST" action="{{ route('admin.experiences.destroy', $item) }}" style="display:inline" onsubmit="return confirm('Delete this experience?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash-can"></i> Delete
-                                    </button>
-                                </form>
+                            <td style="text-align:right">
+                                <div class="action-group">
+                                    <a href="{{ route('admin.experiences.edit', $item) }}" class="btn btn-edit">
+                                        <i class="fas fa-pen-to-square mr-1"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('admin.experiences.destroy', $item) }}" onsubmit="return confirm('Delete this experience?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-delete">
+                                            <i class="fas fa-trash-can mr-1"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fas fa-briefcase fa-2x mb-2 d-block" style="opacity:0.4"></i>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-briefcase"></i>
                                 No experiences yet. Click "Add Experience" to create one.
                             </td>
                         </tr>

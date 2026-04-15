@@ -16,11 +16,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::query()->updateOrCreate([
+        $this->call(RolesAndPermissionsSeeder::class);
+
+        $admin = User::query()->updateOrCreate([
             'email' => 'admin@portfolio.com',
         ], [
             'name' => 'Admin',
             'password' => Hash::make('admin12345'),
         ]);
+
+        $admin->syncRoles(['admin']);
     }
 }

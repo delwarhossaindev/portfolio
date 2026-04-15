@@ -4,8 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ExperienceController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', [PortfolioController::class, 'index']);
 Route::post('/contact', [PortfolioController::class, 'contact'])->name('contact.store');
@@ -34,4 +37,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
     Route::get('/admin/contacts/{contact}', [ContactController::class, 'show'])->name('admin.contacts.show');
     Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
+
+    Route::resource('admin/users', UserController::class)
+        ->except(['show'])
+        ->names('admin.users');
+
+    Route::resource('admin/roles', RoleController::class)
+        ->except(['show'])
+        ->names('admin.roles');
+
+    Route::resource('admin/permissions', PermissionController::class)
+        ->except(['show'])
+        ->names('admin.permissions');
 });

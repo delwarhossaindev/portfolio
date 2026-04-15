@@ -10,8 +10,103 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}">
+    <style>
+        #page-preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 40%, #1a1f3a 0%, #0b0f1e 60%, #05070f 100%);
+            transition: opacity 0.55s ease, visibility 0.55s ease;
+        }
+        #page-preloader.preloader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        #page-preloader .pl-ring {
+            position: relative;
+            width: 96px;
+            height: 96px;
+        }
+        #page-preloader .pl-ring::before,
+        #page-preloader .pl-ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px solid transparent;
+        }
+        #page-preloader .pl-ring::before {
+            border-top-color: #6366f1;
+            border-right-color: #ec4899;
+            animation: pl-spin 1.1s linear infinite;
+        }
+        #page-preloader .pl-ring::after {
+            inset: 14px;
+            border-bottom-color: #22d3ee;
+            border-left-color: #a855f7;
+            animation: pl-spin 1.6s linear reverse infinite;
+        }
+        #page-preloader .pl-core {
+            position: absolute;
+            inset: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            box-shadow: 0 0 22px rgba(99,102,241,0.55);
+            animation: pl-pulse 1.4s ease-in-out infinite;
+        }
+        #page-preloader .pl-brand {
+            margin-top: 28px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 6px;
+            background: linear-gradient(90deg, #6366f1, #ec4899, #22d3ee);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pl-shimmer 2.5s linear infinite;
+        }
+        #page-preloader .pl-label {
+            margin-top: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: #64748b;
+            letter-spacing: 2px;
+        }
+        #page-preloader .pl-dots::after {
+            content: '';
+            animation: pl-dots 1.4s steps(4, end) infinite;
+        }
+        @keyframes pl-spin { to { transform: rotate(360deg); } }
+        @keyframes pl-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.95; }
+            50% { transform: scale(0.82); opacity: 0.65; }
+        }
+        @keyframes pl-shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        @keyframes pl-dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+    </style>
 </head>
 <body>
+    <div id="page-preloader" aria-hidden="true">
+        <div class="pl-ring">
+            <div class="pl-core"></div>
+        </div>
+        <div class="pl-brand">DELWAR</div>
+        <div class="pl-label">loading<span class="pl-dots"></span></div>
+    </div>
     {{-- Navigation --}}
     <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -334,6 +429,21 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
+    <script>
+        (function () {
+            const pre = document.getElementById('page-preloader');
+            if (!pre) return;
+            let hidden = false;
+            function hide() {
+                if (hidden) return;
+                hidden = true;
+                pre.classList.add('preloader-hidden');
+                setTimeout(() => pre.remove(), 700);
+            }
+            window.addEventListener('load', () => setTimeout(hide, 400));
+            setTimeout(hide, 4000);
+        })();
+    </script>
     <script src="{{ asset('js/portfolio.js') }}"></script>
 </body>
 </html>

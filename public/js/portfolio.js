@@ -7,7 +7,6 @@ const savedTheme = localStorage.getItem('theme') || 'dark';
 htmlEl.setAttribute('data-theme', savedTheme);
 
 themeSwitch.addEventListener('click', () => {
-    // Add transition class for smooth color change
     document.body.classList.add('theme-transitioning');
 
     const currentTheme = htmlEl.getAttribute('data-theme');
@@ -16,7 +15,6 @@ themeSwitch.addEventListener('click', () => {
     htmlEl.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
 
-    // Remove transition class after animation
     setTimeout(() => {
         document.body.classList.remove('theme-transitioning');
     }, 500);
@@ -154,6 +152,20 @@ backToTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+// ===== Scroll Indicator Hide on Scroll =====
+const scrollIndicator = document.querySelector('.scroll-indicator');
+if (scrollIndicator) {
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            scrollIndicator.style.opacity = '0';
+            scrollIndicator.style.pointerEvents = 'none';
+        } else {
+            scrollIndicator.style.opacity = '1';
+            scrollIndicator.style.pointerEvents = 'auto';
+        }
+    });
+}
+
 // ===== Scroll Animations =====
 const observerOptions = {
     threshold: 0.1,
@@ -168,8 +180,14 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Add fade-in class to elements
+// Add fade-in class to individual elements
 document.querySelectorAll('.timeline-item, .project-card, .stat-item, .tech-icon, .contact-item').forEach(el => {
+    el.classList.add('fade-in');
+    observer.observe(el);
+});
+
+// Also observe larger containers for stagger parent
+document.querySelectorAll('.about-content, .tech-stack, .contact-info, .contact-form-wrapper').forEach(el => {
     el.classList.add('fade-in');
     observer.observe(el);
 });
@@ -221,3 +239,16 @@ for (let i = 0; i < 30; i++) {
     particle.style.animationDuration = (4 + Math.random() * 4) + 's';
     particlesContainer.appendChild(particle);
 }
+
+// ===== Smooth Navbar Link Scroll =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        const target = document.querySelector(targetId);
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});

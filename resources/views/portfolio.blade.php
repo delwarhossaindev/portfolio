@@ -169,7 +169,7 @@
                         <a href="mailto:{{ $content->contact_email }}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>
                     </div>
                     <div class="hero-actions">
-                        <a href="#contact" class="btn btn-primary">Hire Me</a>
+                        <a href="#contact" class="btn btn-primary"><span>Hire Me</span></a>
                         <a href="{{ asset('files/CV_Delwar_Hossain.pdf') }}" class="btn btn-outline" download><i class="fas fa-download"></i> Resume</a>
                     </div>
                 </div>
@@ -181,12 +181,16 @@
                 </div>
             </div>
         </div>
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"></div>
+            <span>scroll</span>
+        </div>
     </section>
 
     {{-- About Me Section --}}
     <section class="about-section" id="about">
         <div class="container">
-            <div class="about-grid">
+            <div class="about-grid fade-in-stagger">
                 <div class="about-content">
                     <h2 class="section-title">{{ $content->about_title }}</h2>
                     <p>{!! nl2br(e($content->about_description)) !!}</p>
@@ -213,7 +217,7 @@
                 </div>
                 <div class="tech-stack">
                     <h2 class="section-title">Tech Stack</h2>
-                    <div class="tech-grid">
+                    <div class="tech-grid fade-in-stagger">
                         {{-- Frontend --}}
                         <div class="tech-icon" title="HTML5">
                             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5">
@@ -273,6 +277,7 @@
     <section class="experience-section" id="experience">
         <div class="container">
             <h2 class="section-title section-title-center">Work Experience</h2>
+            <p class="section-subtitle">My professional journey and career milestones</p>
             <div class="timeline">
                 @foreach($experiences as $exp)
                     <div class="timeline-item">
@@ -309,7 +314,8 @@
     <section class="projects-section" id="projects">
         <div class="container">
             <h2 class="section-title section-title-center">Projects</h2>
-            <div class="projects-grid">
+            <p class="section-subtitle">Things I've built that I'm proud of</p>
+            <div class="projects-grid fade-in-stagger">
                 @foreach($projects as $project)
                     <div class="project-card {{ $project->is_featured ? 'featured' : '' }}">
                         <div class="project-header">
@@ -420,7 +426,28 @@
     {{-- Footer --}}
     <footer class="footer">
         <div class="container">
-            <p>&copy; {{ date('Y') }} {{ $content->hero_name }}. All Rights Reserved.</p>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-text">DELWAR</span>
+                    <p>Building robust web solutions with Laravel & Vue.js</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#experience">Experience</a>
+                    <a href="#projects">Projects</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-social">
+                    <a href="{{ $content->linkedin_url }}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ $content->github_url }}" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="mailto:{{ $content->contact_email }}" title="Email"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ date('Y') }} {{ $content->hero_name }}. All Rights Reserved.</p>
+                <span class="built-with">Built with <i class="fas fa-heart"></i> using Laravel</span>
+            </div>
         </div>
     </footer>
 

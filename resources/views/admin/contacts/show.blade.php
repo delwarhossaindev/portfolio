@@ -16,6 +16,12 @@
             <p><i class="fas fa-at text-info mr-2"></i><strong>Email:</strong> <a href="mailto:{{ $item->email }}">{{ $item->email }}</a></p>
             <p><i class="fas fa-tag text-info mr-2"></i><strong>Subject:</strong> {{ $item->subject }}</p>
             <p><i class="far fa-clock text-info mr-2"></i><strong>Received:</strong> {{ $item->created_at?->format('M d, Y H:i') }}</p>
+            @if($item->ip_address)
+                <p><i class="fas fa-network-wired text-info mr-2"></i><strong>IP:</strong> <code>{{ $item->ip_address }}</code></p>
+            @endif
+            @if($item->read_at)
+                <p><i class="fas fa-eye text-success mr-2"></i><strong>Read:</strong> {{ $item->read_at->diffForHumans() }}</p>
+            @endif
             <hr>
             <p><i class="fas fa-comment-dots text-info mr-2"></i><strong>Message:</strong></p>
             <div class="p-3" style="background:rgba(79,70,229,0.08); border-radius:8px; border-left:3px solid #6366f1">

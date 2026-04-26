@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -30,8 +31,8 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:150',
             'email' => 'required|email|max:190|unique:users,email',
-            'password' => 'required|string|min:6',
-            'roles' => 'array',
+            'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()->mixedCase()],
+            'roles' => 'array|max:20',
             'roles.*' => 'string|exists:roles,name',
         ]);
 
@@ -59,8 +60,8 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:150',
             'email' => ['required', 'email', 'max:190', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6',
-            'roles' => 'array',
+            'password' => ['nullable', 'confirmed', Password::min(8)->letters()->numbers()->mixedCase()],
+            'roles' => 'array|max:20',
             'roles.*' => 'string|exists:roles,name',
         ]);
 
@@ -71,7 +72,12 @@ class UserController extends Controller
         }
         $user->save();
 
-        $user->syncRoles($data['roles'] ?? []);
+        // Prevent self-demotion: users editing themselves can't strip their own roles
+        if (auth()->id() === $user->id && empty($data['roles'])) {
+            // skip role sync to keep existing roles
+        } else {
+            $user->syncRoles($data['roles'] ?? []);
+        }
 
         return redirect()->route('admin.users.index')->with('admin_success', 'User updated.');
     }

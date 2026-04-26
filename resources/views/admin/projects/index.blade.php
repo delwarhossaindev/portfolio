@@ -18,10 +18,12 @@
                         <th style="width:70px">#</th>
                         <th style="width:320px"><i class="fas fa-heading mr-1"></i> Title</th>
                         <th><i class="fas fa-tag mr-1"></i> Badge</th>
-                        <th style="width:120px">Featured</th>
-                        <th style="width:80px">Order</th>
-                        <th style="width:110px">Status</th>
-                        <th style="width:180px; text-align:right">Actions</th>
+                        <th style="width:90px">Links</th>
+                        <th style="width:80px">Views</th>
+                        <th style="width:110px">Featured</th>
+                        <th style="width:70px">Order</th>
+                        <th style="width:100px">Status</th>
+                        <th style="width:200px; text-align:right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,6 +49,18 @@
                                 @endif
                             </td>
                             <td>
+                                @if($item->live_url)
+                                    <a href="{{ $item->live_url }}" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
+                                @endif
+                                @if($item->github_url)
+                                    <a href="{{ $item->github_url }}" target="_blank" title="GitHub" class="ml-2"><i class="fab fa-github"></i></a>
+                                @endif
+                                @if(! $item->live_url && ! $item->github_url)
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
+                            <td><span class="order-chip">{{ $item->view_count }}</span></td>
+                            <td>
                                 @if($item->is_featured)
                                     <span class="pill pill-warning"><i class="fas fa-star mr-1"></i>Featured</span>
                                 @else
@@ -63,6 +77,11 @@
                             </td>
                             <td style="text-align:right">
                                 <div class="action-group">
+                                    @if($item->slug)
+                                        <a href="{{ route('projects.show', $item->slug) }}" target="_blank" class="btn btn-edit" title="View on site">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    @endif
                                     <a href="{{ route('admin.projects.edit', $item) }}" class="btn btn-edit">
                                         <i class="fas fa-pen-to-square mr-1"></i> Edit
                                     </a>
@@ -78,7 +97,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="empty-state">
+                            <td colspan="9" class="empty-state">
                                 <i class="fas fa-diagram-project"></i>
                                 No projects yet. Click "Add Project" to create one.
                             </td>

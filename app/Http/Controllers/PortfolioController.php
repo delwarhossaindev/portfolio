@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactSubmitted;
 use App\Models\Contact;
 use App\Models\PortfolioContent;
 use App\Models\Experience;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 
 class PortfolioController extends Controller
@@ -157,23 +162,79 @@ class PortfolioController extends Controller
             ->get();
     }
 
+    public function showProject(Project $project)
+    {
+        if (! $project->is_active) {
+            abort(404);
+        }
+
+        $project->increment('view_count');
+
+        $relatedProjects = Project::where('is_active', true)
+            ->where('id', '!=', $project->id)
+            ->orderBy('sort_order')
+            ->limit(3)
+            ->get();
+
+        return view('project-detail', [
+            'project' => $project,
+            'related' => $relatedProjects,
+            'content' => $this->getPortfolioContent(),
+        ]);
+    }
+
     public function contact(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        // Honeypot - if "website" field is filled, treat as bot
+        if (filled($request->input('website'))) {
+            return back()->with('success', 'Message sent successfully!');
+        }
+
+        // Rate limit: 3 submissions per hour per IP
+        $rateKey = 'contact:' . $request->ip();
+        if (RateLimiter::tooManyAttempts($rateKey, 3)) {
+            $minutes = ceil(RateLimiter::availableIn($rateKey) / 60);
+            return back()
+                ->withInput()
+                ->withErrors(['message' => "Too many messages sent. Please try again in {$minutes} minutes."]);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|min:2|max:255',
             'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string',
+            'subject' => 'required|string|min:3|max:255',
+            'message' => 'required|string|min:10|max:5000',
         ]);
 
-        // Store contact message
-        \App\Models\Contact::create($request->only(['name', 'email', 'subject', 'message']));
+        RateLimiter::hit($rateKey, 3600);
 
-        return back()->with('success', 'Message sent successfully!');
+        $contact = Contact::create($validated + [
+            'ip_address' => $request->ip(),
+        ]);
+
+        $this->sendContactNotification($contact);
+
+        return back()->with('success', 'Message sent successfully! I will get back to you soon.');
+    }
+
+    private function sendContactNotification(Contact $contact): void
+    {
+        try {
+            $recipient = $this->getPortfolioContent()->contact_email;
+            if ($recipient) {
+                Mail::to($recipient)->send(new ContactSubmitted($contact));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Contact notification email failed', [
+                'contact_id' => $contact->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function terminalPanel()
     {
+        abort_unless(app()->environment('local') && config('app.debug'), 404);
         return view('terminal-panel');
     }
 
@@ -221,29 +282,108 @@ class PortfolioController extends Controller
 
     public function runTerminalCommand(Request $request)
     {
+        // Hard-fail outside local+debug regardless of how the route was reached.
+        abort_unless(app()->environment('local') && config('app.debug'), 404);
+
         $validated = $request->validate([
-            'command' => 'required|string|max:1000',
+            'command' => 'required|string|max:500',
         ]);
 
         $command = trim($validated['command']);
-        $phpBinary = $this->resolvePhpBinary();
-        if (preg_match('/^php\s+artisan\b/i', $command) === 1) {
-            $command = preg_replace('/^php\b/i', '"' . $phpBinary . '"', $command, 1);
-        } elseif (preg_match('/^artisan\b/i', $command) === 1) {
-            $command = '"' . $phpBinary . '" ' . $command;
+
+        // Strip optional `php ` prefix
+        $command = preg_replace('/^php\s+/i', '', $command);
+
+        // Only allow artisan commands
+        if (! preg_match('/^artisan\s+([a-z][a-z0-9:-]*)\b(.*)$/i', $command, $m)) {
+            return back()->with([
+                'command' => $validated['command'],
+                'output' => '',
+                'error_output' => 'Only "artisan <command> [args]" is allowed.',
+                'exit_code' => 1,
+                'successful' => false,
+            ]);
         }
 
-        $result = Process::path(base_path())
-            ->timeout(30)
-            ->run($command);
+        $artisanCmd = strtolower($m[1]);
+        $artisanArgs = $m[2];
 
-        return back()->with([
-            'command' => $validated['command'],
-            'output' => $result->output(),
-            'error_output' => $result->errorOutput(),
-            'exit_code' => $result->exitCode(),
-            'successful' => $result->successful(),
-        ]);
+        // Block destructive/sensitive commands
+        $blocked = [
+            'env', 'tinker',
+            'db:wipe', 'db:seed',
+            'migrate:fresh', 'migrate:reset', 'migrate:rollback',
+            'storage:unlink',
+            'config:cache', 'config:show',
+            'app:env',
+        ];
+        if (in_array($artisanCmd, $blocked, true)
+            || str_starts_with($artisanCmd, 'queue:')
+            || str_contains($artisanArgs, '--env=')
+            || str_contains($artisanArgs, '`')
+            || str_contains($artisanArgs, '$(')
+            || str_contains($artisanArgs, '|')
+            || str_contains($artisanArgs, ';')
+            || str_contains($artisanArgs, '&')
+            || str_contains($artisanArgs, '>')
+            || str_contains($artisanArgs, '<')
+        ) {
+            return back()->with([
+                'command' => $validated['command'],
+                'output' => '',
+                'error_output' => "Command '{$artisanCmd}' or its arguments are not permitted.",
+                'exit_code' => 1,
+                'successful' => false,
+            ]);
+        }
+
+        // Run via Artisan facade (no shell exec) - safer than Process
+        try {
+            \Artisan::call($artisanCmd, $this->parseArtisanArgs($artisanArgs));
+            $output = \Artisan::output();
+            return back()->with([
+                'command' => $validated['command'],
+                'output' => $output,
+                'error_output' => '',
+                'exit_code' => 0,
+                'successful' => true,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Terminal command failed', [
+                'command' => $artisanCmd,
+                'user' => auth()->user()?->email,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with([
+                'command' => $validated['command'],
+                'output' => '',
+                'error_output' => $e->getMessage(),
+                'exit_code' => 1,
+                'successful' => false,
+            ]);
+        }
+    }
+
+    private function parseArtisanArgs(string $argString): array
+    {
+        $argString = trim($argString);
+        if ($argString === '') return [];
+
+        $parts = preg_split('/\s+/', $argString) ?: [];
+        $args = [];
+        $positional = 1;
+
+        foreach ($parts as $part) {
+            if (str_starts_with($part, '--')) {
+                $kv = explode('=', substr($part, 2), 2);
+                $args['--' . $kv[0]] = $kv[1] ?? true;
+            } elseif (str_starts_with($part, '-')) {
+                $args[$part] = true;
+            } else {
+                $args['arg' . ($positional++)] = $part;
+            }
+        }
+        return $args;
     }
 
     public function dashboard()
@@ -253,6 +393,7 @@ class PortfolioController extends Controller
         return view('admin.dashboard', [
             'stats' => [
                 'contacts' => Contact::count(),
+                'unreadContacts' => Contact::unread()->count(),
                 'experiences' => Experience::count(),
                 'projects' => Project::count(),
                 'featuredProjects' => Project::where('is_featured', true)->count(),
@@ -286,8 +427,25 @@ class PortfolioController extends Controller
             'contact_location' => 'required|string|max:255',
             'linkedin_url' => 'nullable|url|max:255',
             'github_url' => 'nullable|url|max:255',
-            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:4096',
+            'profile_image' => [
+                'nullable', 'file', 'image',
+                'mimetypes:image/jpeg,image/png,image/webp',
+                'max:4096',
+                'dimensions:min_width=200,min_height=200,max_width=4000,max_height=4000',
+            ],
             'remove_profile_image' => 'nullable|boolean',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+            'twitter_handle' => ['nullable', 'string', 'max:50', 'regex:/^@?[A-Za-z0-9_]{1,30}$/'],
+            'site_url' => 'nullable|url|max:255',
+            'og_image' => [
+                'nullable', 'file', 'image',
+                'mimetypes:image/jpeg,image/png,image/webp',
+                'max:4096',
+                'dimensions:min_width=600,min_height=315,max_width=4000,max_height=4000',
+            ],
+            'remove_og_image' => 'nullable|boolean',
         ]);
 
         $content = PortfolioContent::query()->firstOrNew([]);
@@ -301,11 +459,28 @@ class PortfolioController extends Controller
             if ($content->profile_image) {
                 Storage::disk('public')->delete($content->profile_image);
             }
-            $content->profile_image = $request->file('profile_image')->store('portfolio', 'public');
+            $content->profile_image = $this->storeOptimizedImage($request->file('profile_image'), 'portfolio', 800);
         }
 
-        $content->fill(collect($validated)->except(['profile_image', 'remove_profile_image'])->toArray());
+        if ($request->boolean('remove_og_image') && $content->og_image) {
+            Storage::disk('public')->delete($content->og_image);
+            $content->og_image = null;
+        }
+
+        if ($request->hasFile('og_image')) {
+            if ($content->og_image) {
+                Storage::disk('public')->delete($content->og_image);
+            }
+            // OG images: 1200x630 ideal, allow up to 1200 wide
+            $content->og_image = $this->storeOptimizedImage($request->file('og_image'), 'portfolio/og', 1200, 88);
+        }
+
+        $content->fill(collect($validated)
+            ->except(['profile_image', 'remove_profile_image', 'og_image', 'remove_og_image'])
+            ->toArray());
         $content->save();
+
+        self::clearPortfolioCache();
 
         return back()->with('admin_success', 'Portfolio content updated successfully.');
     }
@@ -325,5 +500,63 @@ class PortfolioController extends Controller
             'linkedin_url' => 'https://www.linkedin.com/in/delwarhossaindev/',
             'github_url' => 'https://github.com/delwarhossaindev',
         ]);
+    }
+
+    public static function clearPortfolioCache(): void
+    {
+        // Kept for backwards compat - cache currently disabled but observers still call this
+        Cache::forget('portfolio.content');
+        Cache::forget('portfolio.experiences');
+        Cache::forget('portfolio.projects');
+    }
+
+    /**
+     * Resize and re-encode an uploaded image, then store it.
+     * Returns the storage-relative path.
+     */
+    private function storeOptimizedImage($file, string $folder, int $maxDim = 800, int $quality = 85): string
+    {
+        if (! function_exists('imagecreatefromstring')) {
+            return $file->store($folder, 'public');
+        }
+
+        try {
+            $contents = file_get_contents($file->getRealPath());
+            $img = @imagecreatefromstring($contents);
+            if (! $img) {
+                return $file->store($folder, 'public');
+            }
+
+            $srcW = imagesx($img);
+            $srcH = imagesy($img);
+
+            // Only resize if larger than max dimension
+            if ($srcW > $maxDim || $srcH > $maxDim) {
+                if ($srcW > $srcH) {
+                    $dstW = $maxDim;
+                    $dstH = (int) round($srcH * ($maxDim / $srcW));
+                } else {
+                    $dstH = $maxDim;
+                    $dstW = (int) round($srcW * ($maxDim / $srcH));
+                }
+                $dst = imagecreatetruecolor($dstW, $dstH);
+                imagecopyresampled($dst, $img, 0, 0, 0, 0, $dstW, $dstH, $srcW, $srcH);
+                imagedestroy($img);
+                $img = $dst;
+            }
+
+            $filename = $folder . '/' . uniqid('img_', true) . '.jpg';
+            $tmpPath = tempnam(sys_get_temp_dir(), 'opt_');
+            imagejpeg($img, $tmpPath, $quality);
+            imagedestroy($img);
+
+            Storage::disk('public')->put($filename, file_get_contents($tmpPath));
+            @unlink($tmpPath);
+
+            return $filename;
+        } catch (\Throwable $e) {
+            Log::warning('Image optimization failed, storing original', ['error' => $e->getMessage()]);
+            return $file->store($folder, 'public');
+        }
     }
 }

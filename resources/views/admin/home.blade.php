@@ -119,6 +119,91 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- SEO Section --}}
+                <div class="card card-outline card-success">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-magnifying-glass-chart mr-1"></i> SEO Settings</h3></div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-info-circle"></i>
+                            These fields control how your portfolio appears in search engines and on social media (Facebook, LinkedIn, Twitter shares).
+                            Leave blank to use sensible defaults.
+                        </p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label><i class="fas fa-heading mr-1"></i> Meta Title <small class="text-muted">(50-60 chars)</small></label>
+                                    <input name="meta_title" class="form-control" maxlength="255"
+                                           value="{{ old('meta_title', $content->meta_title) }}"
+                                           placeholder="e.g. Delwar Hossain - Full Stack Laravel Developer">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label><i class="fas fa-globe mr-1"></i> Site URL</label>
+                                    <input type="url" name="site_url" class="form-control"
+                                           value="{{ old('site_url', $content->site_url) }}"
+                                           placeholder="https://yourdomain.com">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label><i class="fas fa-align-left mr-1"></i> Meta Description <small class="text-muted">(150-160 chars)</small></label>
+                                    <textarea name="meta_description" rows="2" maxlength="500" class="form-control"
+                                              placeholder="Short description that shows in Google results">{{ old('meta_description', $content->meta_description) }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label><i class="fas fa-tags mr-1"></i> Meta Keywords <small class="text-muted">(comma separated)</small></label>
+                                    <input name="meta_keywords" class="form-control"
+                                           value="{{ old('meta_keywords', $content->meta_keywords) }}"
+                                           placeholder="Laravel, Vue.js, PHP Developer, Bangladesh">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label><i class="fab fa-twitter mr-1"></i> Twitter Handle</label>
+                                    <input name="twitter_handle" class="form-control"
+                                           value="{{ old('twitter_handle', $content->twitter_handle) }}"
+                                           placeholder="@yourhandle">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label><i class="fas fa-share-nodes mr-1"></i> Social Share Image (OG image)</label>
+                                    <small class="form-text text-muted mb-2">
+                                        This shows when your link is shared on Facebook, LinkedIn, Twitter, WhatsApp, etc.
+                                        Recommended: 1200×630 pixels. JPG/PNG/WEBP, max 4 MB.
+                                        If empty, your profile image will be used.
+                                    </small>
+                                    <div class="d-flex align-items-center" style="gap:18px; flex-wrap:wrap">
+                                        <div style="width:200px; height:105px; border-radius:8px; overflow:hidden; border:1px solid rgba(99,102,241,0.45); background:#1f2937">
+                                            @if($content->og_image)
+                                                <img src="{{ asset('storage/' . $content->og_image) }}" alt="OG image" style="width:100%; height:100%; object-fit:cover">
+                                            @else
+                                                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#666; font-size:0.8rem">
+                                                    <i class="fas fa-image fa-2x"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div style="flex:1; min-width:240px">
+                                            <input type="file" name="og_image" accept="image/*" class="form-control-file">
+                                            @if($content->og_image)
+                                                <div class="custom-control custom-checkbox mt-2">
+                                                    <input type="checkbox" class="custom-control-input" id="remove_og_image" name="remove_og_image" value="1">
+                                                    <label class="custom-control-label text-danger" for="remove_og_image">
+                                                        <i class="fas fa-trash-can mr-1"></i> Remove OG image
+                                                    </label>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-footer">
                 <button type="submit" class="btn btn-primary">

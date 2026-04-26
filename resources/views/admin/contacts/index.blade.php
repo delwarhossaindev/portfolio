@@ -5,8 +5,22 @@
 
 @section('content')
     <div class="card card-primary card-outline">
-        <div class="card-header">
-            <h3 class="card-title mb-0"><i class="fas fa-envelope-open-text mr-1"></i> All Messages <span class="badge badge-info ml-2">{{ $items->total() }}</span></h3>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-envelope-open-text mr-1"></i> All Messages
+                <span class="badge badge-info ml-2">{{ $items->total() }}</span>
+                @if($unreadCount > 0)
+                    <span class="badge badge-danger ml-1">{{ $unreadCount }} unread</span>
+                @endif
+            </h3>
+            @if($unreadCount > 0)
+                <form method="POST" action="{{ route('admin.contacts.markAllRead') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-check-double mr-1"></i> Mark all read
+                    </button>
+                </form>
+            @endif
         </div>
         <div class="card-body p-0">
             <table class="admin-table">
@@ -21,18 +35,23 @@
                 </thead>
                 <tbody>
                     @forelse($items as $item)
-                        <tr>
-                            <td><span class="row-index">{{ $item->id }}</span></td>
+                        <tr style="{{ $item->is_read ? '' : 'background: rgba(99,102,241,0.04);' }}">
+                            <td>
+                                <span class="row-index">{{ $item->id }}</span>
+                                @unless($item->is_read)
+                                    <span class="badge badge-primary ml-1" style="font-size:9px;">NEW</span>
+                                @endunless
+                            </td>
                             <td>
                                 <div class="user-cell">
                                     <span class="avatar-circle">{{ strtoupper(mb_substr($item->name, 0, 1)) }}</span>
                                     <div class="user-meta">
-                                        <div class="user-name">{{ $item->name }}</div>
+                                        <div class="user-name" style="{{ $item->is_read ? '' : 'font-weight:700;' }}">{{ $item->name }}</div>
                                         <div class="user-sub"><a href="mailto:{{ $item->email }}" style="color:inherit"><i class="fas fa-at mr-1"></i>{{ $item->email }}</a></div>
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ \Illuminate\Support\Str::limit($item->subject, 50) }}</td>
+                            <td style="{{ $item->is_read ? '' : 'font-weight:600;' }}">{{ \Illuminate\Support\Str::limit($item->subject, 50) }}</td>
                             <td><span class="pill pill-muted"><i class="far fa-clock mr-1"></i>{{ $item->created_at?->diffForHumans() }}</span></td>
                             <td style="text-align:right">
                                 <div class="action-group">
@@ -51,7 +70,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="empty-state">
+                            <td colspan="6" class="empty-state">
                                 <i class="fas fa-inbox"></i>
                                 No messages yet.
                             </td>

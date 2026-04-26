@@ -3,13 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{{ $content->hero_name }} - Portfolio">
-    <title>{{ $content->hero_name }} - Portfolio</title>
+
+    @include('partials.seo-meta', [
+        'seoTitle' => $content->meta_title ?: $content->hero_name . ' - Full Stack Developer Portfolio',
+        'seoType' => 'website',
+    ])
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}">
+
+    {{-- JSON-LD: Person schema --}}
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "Person",
+        "name": @json($content->hero_name),
+        "jobTitle": "Full Stack Developer",
+        "url": @json(url('/')),
+        "image": @json($content->profile_image ? asset('storage/' . $content->profile_image) : asset('images/profile.jpg')),
+        "email": @json('mailto:' . $content->contact_email),
+        "telephone": @json($content->contact_phone),
+        "address": {
+            "@@type": "PostalAddress",
+            "addressLocality": @json($content->contact_location)
+        },
+        "sameAs": [
+            @json($content->linkedin_url),
+            @json($content->github_url)
+        ],
+        "knowsAbout": ["PHP", "Laravel", "Vue.js", "JavaScript", "MySQL", "REST API", "Full Stack Development"],
+        "alumniOf": {
+            "@@type": "EducationalOrganization",
+            "name": "Bangladesh Army International University of Science and Technology (BAIUST)"
+        },
+        "description": @json($content->hero_description)
+    }
+    </script>
+
+    {{-- JSON-LD: WebSite schema --}}
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
+        "name": @json($content->hero_name . ' Portfolio'),
+        "url": @json(url('/')),
+        "description": @json($content->hero_description)
+    }
+    </script>
     <style>
         #page-preloader {
             position: fixed;
@@ -100,6 +147,9 @@
     </style>
 </head>
 <body>
+    {{-- Skip to main content (keyboard a11y) --}}
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <div id="page-preloader" aria-hidden="true">
         <div class="pl-ring">
             <div class="pl-core"></div>
@@ -107,12 +157,16 @@
         <div class="pl-brand">DELWAR</div>
         <div class="pl-label">loading<span class="pl-dots"></span></div>
     </div>
+
+    {{-- Live region for status announcements (form success, etc.) --}}
+    <div id="live-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
     {{-- Navigation --}}
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="#" class="nav-logo">
+            <a href="#home" class="nav-logo" aria-label="DELWAR - Home">
                 <span class="logo-text">DELWAR</span>
-                <div class="logo-eyes">
+                <div class="logo-eyes" aria-hidden="true">
                     <div class="eye">
                         <div class="eyeball"></div>
                     </div>
@@ -125,74 +179,104 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#projects">Projects</a></li>
+                {{-- <li><a href="{{ route('blog.index') }}">Blog</a></li> --}}
                 <li><a href="#contact">Contact</a></li>
                 @auth
-                    <li><a href="{{ route('admin.dashboard') }}"><i class="fas fa-gauge"></i> Dashboard</a></li>
+                    <li><a href="{{ route('admin.dashboard') }}"><i class="fas fa-gauge" aria-hidden="true"></i> Dashboard</a></li>
                     <li>
                         <form method="POST" action="{{ route('admin.logout') }}" style="display:inline;">
                             @csrf
-                            <button type="submit" class="nav-signin-btn"><i class="fas fa-right-from-bracket"></i> Logout</button>
+                            <button type="submit" class="nav-signin-btn"><i class="fas fa-right-from-bracket" aria-hidden="true"></i> Logout</button>
                         </form>
                     </li>
                 @else
-                    <li><a href="{{ route('admin.login') }}" class="nav-signin"><i class="fas fa-right-to-bracket"></i> Sign In</a></li>
+                    <li><a href="{{ route('admin.login') }}" class="nav-signin"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</a></li>
                 @endauth
             </ul>
             <div class="nav-right">
-                <div class="theme-switch" id="themeSwitch" title="Toggle Light/Dark Mode">
-                    <i class="fas fa-sun"></i>
-                    <div class="switch-track">
-                        <div class="switch-thumb"></div>
-                    </div>
-                    <i class="fas fa-moon"></i>
-                </div>
-                <button class="nav-toggle" id="navToggle">
-                    <i class="fas fa-bars"></i>
+                <button type="button"
+                        class="theme-switch"
+                        id="themeSwitch"
+                        role="switch"
+                        aria-checked="false"
+                        aria-label="Toggle light and dark mode">
+                    <i class="fas fa-sun" aria-hidden="true"></i>
+                    <span class="switch-track" aria-hidden="true">
+                        <span class="switch-thumb"></span>
+                    </span>
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                </button>
+                <button class="nav-toggle"
+                        id="navToggle"
+                        type="button"
+                        aria-label="Open menu"
+                        aria-expanded="false"
+                        aria-controls="navLinks">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
     </nav>
 
+    <main id="main-content">
+
     {{-- Hero Section --}}
-    <section class="hero" id="home">
-        <div class="hero-particles" id="particles"></div>
+    <section class="hero" id="home" aria-labelledby="hero-heading">
+        <div class="hero-particles" id="particles" aria-hidden="true"></div>
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
                     <p class="hero-greeting">{{ $content->hero_greeting }}</p>
-                    <h1 class="hero-name">{{ $content->hero_name }}</h1>
-                    <p class="hero-role">I'm a <span class="typed-text" id="typedText" data-roles="{{ $content->hero_roles }}"></span><span class="cursor">|</span></p>
+                    <h1 class="hero-name" id="hero-heading">{{ $content->hero_name }}</h1>
+                    <p class="hero-role">I'm a <span class="typed-text" id="typedText" data-roles="{{ $content->hero_roles }}" aria-live="polite"></span><span class="cursor" aria-hidden="true">|</span></p>
                     <p class="hero-description">{{ $content->hero_description }}</p>
-                    <div class="hero-social">
-                        <a href="{{ $content->linkedin_url }}" class="social-link" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="{{ $content->github_url }}" class="social-link" title="GitHub" target="_blank"><i class="fab fa-github"></i></a>
-                        <a href="mailto:{{ $content->contact_email }}" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>
+                    <div class="hero-social" aria-label="Social links">
+                        <a href="{{ $content->linkedin_url }}" class="social-link" aria-label="LinkedIn profile (opens in new tab)" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                        <a href="{{ $content->github_url }}" class="social-link" aria-label="GitHub profile (opens in new tab)" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i></a>
+                        <a href="mailto:{{ $content->contact_email }}" class="social-link" aria-label="Send email"><i class="fas fa-envelope" aria-hidden="true"></i></a>
                     </div>
                     <div class="hero-actions">
                         <a href="#contact" class="btn btn-primary"><span>Hire Me</span></a>
-                        <a href="{{ asset('files/CV_Delwar_Hossain.pdf') }}" class="btn btn-outline" download><i class="fas fa-download"></i> Resume</a>
+                        <a href="{{ asset('files/CV_Delwar_Hossain.pdf') }}" class="btn btn-outline" download aria-label="Download resume PDF"><i class="fas fa-download" aria-hidden="true"></i> Resume</a>
                     </div>
                 </div>
                 <div class="hero-image">
                     <div class="image-wrapper">
-                        <div class="image-glow"></div>
-                        <img src="{{ $content->profile_image ? asset('storage/' . $content->profile_image) : asset('images/profile.jpg') }}" alt="{{ $content->hero_name }}" class="profile-img">
+                        <div class="image-glow" aria-hidden="true"></div>
+                        @if($content->profile_image)
+                            <img src="{{ asset('storage/' . $content->profile_image) }}"
+                                 alt="Portrait of {{ $content->hero_name }}"
+                                 class="profile-img"
+                                 fetchpriority="high"
+                                 decoding="async"
+                                 width="340" height="340">
+                        @else
+                            <picture>
+                                <source srcset="{{ asset('images/profile.webp') }}" type="image/webp">
+                                <img src="{{ asset('images/profile.jpg') }}"
+                                     alt="Portrait of {{ $content->hero_name }}"
+                                     class="profile-img"
+                                     fetchpriority="high"
+                                     decoding="async"
+                                     width="340" height="340">
+                            </picture>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-        <div class="scroll-indicator">
+        <div class="scroll-indicator" aria-hidden="true">
             <div class="scroll-mouse"></div>
             <span>scroll</span>
         </div>
     </section>
 
     {{-- About Me Section --}}
-    <section class="about-section" id="about">
+    <section class="about-section" id="about" aria-labelledby="about-heading">
         <div class="container">
             <div class="about-grid fade-in-stagger">
                 <div class="about-content">
-                    <h2 class="section-title">{{ $content->about_title }}</h2>
+                    <h2 class="section-title" id="about-heading">{{ $content->about_title }}</h2>
                     <p>{!! nl2br(e($content->about_description)) !!}</p>
                     <p>
                         I hold a <strong>Bachelor of Science in Computer Science & Engineering</strong> from
@@ -216,56 +300,56 @@
                     </div>
                 </div>
                 <div class="tech-stack">
-                    <h2 class="section-title">Tech Stack</h2>
-                    <div class="tech-grid fade-in-stagger">
+                    <h2 class="section-title" id="tech-heading">Tech Stack</h2>
+                    <div class="tech-grid fade-in-stagger" aria-labelledby="tech-heading">
                         {{-- Frontend --}}
                         <div class="tech-icon" title="HTML5">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" loading="lazy" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="CSS3">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="JavaScript">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="Vue.js">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg" alt="Vue.js">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg" alt="Vue.js" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="jQuery">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jquery/jquery-original.svg" alt="jQuery">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jquery/jquery-original.svg" alt="jQuery" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="Bootstrap">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" alt="Bootstrap">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" alt="Bootstrap" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         {{-- Backend --}}
                         <div class="tech-icon" title="PHP">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="Laravel">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="Java">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         {{-- Database --}}
                         <div class="tech-icon" title="MySQL">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="Oracle">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         {{-- Tools --}}
                         <div class="tech-icon" title="Git">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="GitHub">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="Trello">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/trello/trello-plain.svg" alt="Trello">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/trello/trello-plain.svg" alt="Trello" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                         <div class="tech-icon" title="VS Code">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" loading="lazy" decoding="async" width="36" height="36">
                         </div>
                     </div>
                 </div>
@@ -274,21 +358,21 @@
     </section>
 
     {{-- Work Experience Section --}}
-    <section class="experience-section" id="experience">
+    <section class="experience-section" id="experience" aria-labelledby="experience-heading">
         <div class="container">
-            <h2 class="section-title section-title-center">Work Experience</h2>
+            <h2 class="section-title section-title-center" id="experience-heading">Work Experience</h2>
             <p class="section-subtitle">My professional journey and career milestones</p>
-            <div class="timeline">
+            <ol class="timeline">
                 @foreach($experiences as $exp)
-                    <div class="timeline-item">
-                        <div class="timeline-dot">
+                    <li class="timeline-item">
+                        <div class="timeline-dot" aria-hidden="true">
                             <i class="{{ $exp->icon ?: 'fas fa-briefcase' }}"></i>
                         </div>
                         <div class="timeline-content">
                             <h3>{{ $exp->role }}</h3>
                             <span class="timeline-company">{{ $exp->company }}</span>
                             @if($exp->location)
-                                <span class="timeline-location"><i class="fas fa-map-marker-alt"></i> {{ $exp->location }}</span>
+                                <span class="timeline-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ $exp->location }}</span>
                             @endif
                             @if($exp->date_range)
                                 <span class="timeline-date">{{ $exp->date_range }}</span>
@@ -297,125 +381,177 @@
                                 <p>{{ $exp->description }}</p>
                             @endif
                             @if(count($exp->techList()))
-                                <div class="timeline-tech">
+                                <div class="timeline-tech" aria-label="Technologies used">
                                     @foreach($exp->techList() as $tech)
                                         <span>{{ $tech }}</span>
                                     @endforeach
                                 </div>
                             @endif
                         </div>
-                    </div>
+                    </li>
                 @endforeach
-            </div>
+            </ol>
         </div>
     </section>
 
     {{-- Projects Section --}}
-    <section class="projects-section" id="projects">
+    <section class="projects-section" id="projects" aria-labelledby="projects-heading">
         <div class="container">
-            <h2 class="section-title section-title-center">Projects</h2>
+            <h2 class="section-title section-title-center" id="projects-heading">Projects</h2>
             <p class="section-subtitle">Things I've built that I'm proud of</p>
             <div class="projects-grid fade-in-stagger">
                 @foreach($projects as $project)
-                    <div class="project-card {{ $project->is_featured ? 'featured' : '' }}">
-                        <div class="project-header">
-                            <i class="{{ $project->icon ?: 'fas fa-folder-open' }} project-icon"></i>
-                            @if($project->company_badge)
-                                <div class="project-links">
-                                    <span class="project-company-badge">{{ $project->company_badge }}</span>
+                    <article class="project-card {{ $project->is_featured ? 'featured' : '' }}" aria-labelledby="project-{{ $project->id }}-title">
+                        @if($project->coverImageUrl())
+                            <a href="{{ route('projects.show', $project->slug) }}" class="project-cover" tabindex="-1" aria-hidden="true">
+                                <img src="{{ $project->coverImageUrl() }}" alt="" loading="lazy">
+                            </a>
+                        @endif
+                        <div class="project-card-body">
+                            <div class="project-header">
+                                <i class="{{ $project->icon ?: 'fas fa-folder-open' }} project-icon" aria-hidden="true"></i>
+                                <div class="project-header-right">
+                                    @if($project->company_badge)
+                                        <span class="project-company-badge">{{ $project->company_badge }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <h3 class="project-title" id="project-{{ $project->id }}-title">
+                                <a href="{{ route('projects.show', $project->slug) }}">{{ $project->title }}</a>
+                            </h3>
+                            @if($project->description)
+                                <p class="project-description">{{ $project->description }}</p>
+                            @endif
+                            @if(count($project->techList()))
+                                <div class="project-tech" aria-label="Technologies used">
+                                    @foreach($project->techList() as $tech)
+                                        <span>{{ $tech }}</span>
+                                    @endforeach
                                 </div>
                             @endif
-                        </div>
-                        <h3 class="project-title">{{ $project->title }}</h3>
-                        @if($project->description)
-                            <p class="project-description">{{ $project->description }}</p>
-                        @endif
-                        @if(count($project->techList()))
-                            <div class="project-tech">
-                                @foreach($project->techList() as $tech)
-                                    <span>{{ $tech }}</span>
-                                @endforeach
+                            <div class="project-card-footer">
+                                <a href="{{ route('projects.show', $project->slug) }}" class="project-view-link" aria-label="View details for {{ $project->title }}">
+                                    View details <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                                </a>
+                                <div class="project-quick-links">
+                                    @if($project->live_url)
+                                        <a href="{{ $project->live_url }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ $project->title }} live demo (opens in new tab)">
+                                            <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                                        </a>
+                                    @endif
+                                    @if($project->github_url)
+                                        <a href="{{ $project->github_url }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ $project->title }} on GitHub (opens in new tab)">
+                                            <i class="fab fa-github" aria-hidden="true"></i>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    </article>
                 @endforeach
             </div>
         </div>
     </section>
 
     {{-- Contact Section --}}
-    <section class="contact-section" id="contact">
+    <section class="contact-section" id="contact" aria-labelledby="contact-heading">
         <div class="container">
-            <h2 class="section-title section-title-center contact-heading">Have a Project in Mind?</h2>
+            <h2 class="section-title section-title-center contact-heading" id="contact-heading">Have a Project in Mind?</h2>
             <p class="contact-subtitle">Fill in the form to start a conversation</p>
 
             <div class="contact-grid">
                 <div class="contact-info">
-                    <h3>Get in touch</h3>
-                    <div class="contact-details">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
+                    <h3 id="contact-info-heading">Get in touch</h3>
+                    <ul class="contact-details" aria-labelledby="contact-info-heading">
+                        <li class="contact-item">
+                            <i class="fas fa-envelope" aria-hidden="true"></i>
                             <div>
                                 <span class="contact-label">Email</span>
                                 <a href="mailto:{{ $content->contact_email }}">{{ $content->contact_email }}</a>
                             </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
+                        </li>
+                        <li class="contact-item">
+                            <i class="fas fa-phone" aria-hidden="true"></i>
                             <div>
                                 <span class="contact-label">Phone</span>
                                 <a href="tel:{{ preg_replace('/\s+/', '', $content->contact_phone) }}">{{ $content->contact_phone }}</a>
                             </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
+                        </li>
+                        <li class="contact-item">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                             <div>
                                 <span class="contact-label">Location</span>
                                 <span>{{ $content->contact_location }}</span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="contact-social">
-                        <a href="{{ $content->linkedin_url }}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="{{ $content->github_url }}" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-                        <a href="mailto:{{ $content->contact_email }}" title="Email"><i class="fas fa-envelope"></i></a>
+                        </li>
+                    </ul>
+                    <div class="contact-social" aria-label="Social profiles">
+                        <a href="{{ $content->linkedin_url }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                        <a href="{{ $content->github_url }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)"><i class="fab fa-github" aria-hidden="true"></i></a>
+                        <a href="mailto:{{ $content->contact_email }}" aria-label="Send email"><i class="fas fa-envelope" aria-hidden="true"></i></a>
                     </div>
                 </div>
 
                 <div class="contact-form-wrapper">
                     @if(session('success'))
-                        <div class="alert-success">
-                            <i class="fas fa-check-circle"></i> {{ session('success') }}
+                        <div class="alert-success" role="status">
+                            <i class="fas fa-check-circle" aria-hidden="true"></i> {{ session('success') }}
                         </div>
                     @endif
-                    <form action="{{ route('contact.store') }}" method="POST" class="contact-form">
+                    @if($errors->any() && ! session('success'))
+                        <div class="alert-error" role="alert">
+                            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                            Please correct the {{ $errors->count() === 1 ? 'error' : 'errors' }} below.
+                        </div>
+                    @endif
+                    <form action="{{ route('contact.store') }}" method="POST" class="contact-form" aria-labelledby="contact-heading" novalidate>
                         @csrf
+                        {{-- Honeypot - hidden from real users, bots fill it --}}
+                        <div class="hp-field" aria-hidden="true">
+                            <label for="website">Leave this empty</label>
+                            <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" value="">
+                        </div>
                         <div class="form-group">
-                            <input type="text" name="name" placeholder="Your Name" required value="{{ old('name') }}">
+                            <label for="contact-name" class="sr-only">Your name</label>
+                            <input type="text" name="name" id="contact-name"
+                                   placeholder="Your Name" required autocomplete="name"
+                                   value="{{ old('name') }}"
+                                   {{ $errors->has('name') ? 'aria-invalid=true aria-describedby=contact-name-error' : '' }}>
                             @error('name')
-                                <span class="form-error">{{ $message }}</span>
+                                <span class="form-error" id="contact-name-error" role="alert">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Your Email" required value="{{ old('email') }}">
+                            <label for="contact-email" class="sr-only">Your email</label>
+                            <input type="email" name="email" id="contact-email"
+                                   placeholder="Your Email" required autocomplete="email"
+                                   value="{{ old('email') }}"
+                                   {{ $errors->has('email') ? 'aria-invalid=true aria-describedby=contact-email-error' : '' }}>
                             @error('email')
-                                <span class="form-error">{{ $message }}</span>
+                                <span class="form-error" id="contact-email-error" role="alert">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="form-group">
-                            <input type="text" name="subject" placeholder="Subject" required value="{{ old('subject') }}">
+                            <label for="contact-subject" class="sr-only">Subject</label>
+                            <input type="text" name="subject" id="contact-subject"
+                                   placeholder="Subject" required
+                                   value="{{ old('subject') }}"
+                                   {{ $errors->has('subject') ? 'aria-invalid=true aria-describedby=contact-subject-error' : '' }}>
                             @error('subject')
-                                <span class="form-error">{{ $message }}</span>
+                                <span class="form-error" id="contact-subject-error" role="alert">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="form-group">
-                            <textarea name="message" placeholder="Your Message" rows="5" required>{{ old('message') }}</textarea>
+                            <label for="contact-message" class="sr-only">Your message</label>
+                            <textarea name="message" id="contact-message"
+                                      placeholder="Your Message" rows="5" required
+                                      {{ $errors->has('message') ? 'aria-invalid=true aria-describedby=contact-message-error' : '' }}>{{ old('message') }}</textarea>
                             @error('message')
-                                <span class="form-error">{{ $message }}</span>
+                                <span class="form-error" id="contact-message-error" role="alert">{{ $message }}</span>
                             @enderror
                         </div>
                         <button type="submit" class="btn btn-primary btn-submit">
-                            <i class="fas fa-paper-plane"></i> Send Message
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
                         </button>
                     </form>
                 </div>
@@ -423,37 +559,39 @@
         </div>
     </section>
 
+    </main>
+
     {{-- Footer --}}
-    <footer class="footer">
+    <footer class="footer" aria-labelledby="footer-brand-title">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <span class="logo-text">DELWAR</span>
+                    <span class="logo-text" id="footer-brand-title">DELWAR</span>
                     <p>Building robust web solutions with Laravel & Vue.js</p>
                 </div>
-                <div class="footer-links">
+                <nav class="footer-links" aria-label="Footer navigation">
                     <a href="#home">Home</a>
                     <a href="#about">About</a>
                     <a href="#experience">Experience</a>
                     <a href="#projects">Projects</a>
                     <a href="#contact">Contact</a>
-                </div>
-                <div class="footer-social">
-                    <a href="{{ $content->linkedin_url }}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="{{ $content->github_url }}" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="mailto:{{ $content->contact_email }}" title="Email"><i class="fas fa-envelope"></i></a>
+                </nav>
+                <div class="footer-social" aria-label="Social profiles">
+                    <a href="{{ $content->linkedin_url }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                    <a href="{{ $content->github_url }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)"><i class="fab fa-github" aria-hidden="true"></i></a>
+                    <a href="mailto:{{ $content->contact_email }}" aria-label="Send email"><i class="fas fa-envelope" aria-hidden="true"></i></a>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; {{ date('Y') }} {{ $content->hero_name }}. All Rights Reserved.</p>
-                <span class="built-with">Built with <i class="fas fa-heart"></i> using Laravel</span>
+                <span class="built-with">Built with <i class="fas fa-heart" aria-label="love"></i> using Laravel</span>
             </div>
         </div>
     </footer>
 
     {{-- Back to top --}}
-    <button class="back-to-top" id="backToTop">
-        <i class="fas fa-arrow-up"></i>
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
     <script>
@@ -471,6 +609,6 @@
             setTimeout(hide, 4000);
         })();
     </script>
-    <script src="{{ asset('js/portfolio.js') }}"></script>
+    <script src="{{ asset('js/portfolio.js') }}" defer></script>
 </body>
 </html>

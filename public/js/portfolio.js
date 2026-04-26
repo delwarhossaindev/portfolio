@@ -2,23 +2,40 @@
 const themeSwitch = document.getElementById('themeSwitch');
 const htmlEl = document.documentElement;
 
+function applyTheme(theme) {
+    htmlEl.setAttribute('data-theme', theme);
+    if (themeSwitch) {
+        themeSwitch.setAttribute('aria-checked', theme === 'dark' ? 'true' : 'false');
+    }
+}
+
 // Load saved theme
 const savedTheme = localStorage.getItem('theme') || 'dark';
-htmlEl.setAttribute('data-theme', savedTheme);
+applyTheme(savedTheme);
 
-themeSwitch.addEventListener('click', () => {
-    document.body.classList.add('theme-transitioning');
+if (themeSwitch) {
+    themeSwitch.addEventListener('click', () => {
+        document.body.classList.add('theme-transitioning');
 
-    const currentTheme = htmlEl.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        const currentTheme = htmlEl.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-    htmlEl.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
 
-    setTimeout(() => {
-        document.body.classList.remove('theme-transitioning');
-    }, 500);
-});
+        setTimeout(() => {
+            document.body.classList.remove('theme-transitioning');
+        }, 500);
+    });
+
+    // Allow Space/Enter to toggle when focused
+    themeSwitch.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            themeSwitch.click();
+        }
+    });
+}
 
 // ===== Eyes Follow Mouse =====
 const eyes = document.querySelectorAll('.eye');
@@ -102,22 +119,37 @@ window.addEventListener('scroll', () => {
 const navToggle = document.getElementById('navToggle');
 const navLinks = document.getElementById('navLinks');
 
-navToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
+function setNavExpanded(expanded) {
+    if (!navToggle || !navLinks) return;
+    navLinks.classList.toggle('active', expanded);
+    navToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    navToggle.setAttribute('aria-label', expanded ? 'Close menu' : 'Open menu');
     const icon = navToggle.querySelector('i');
-    icon.classList.toggle('fa-bars');
-    icon.classList.toggle('fa-times');
-});
+    if (icon) {
+        icon.classList.toggle('fa-bars', !expanded);
+        icon.classList.toggle('fa-times', expanded);
+    }
+}
 
-// Close mobile nav on link click
-navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-        const icon = navToggle.querySelector('i');
-        icon.classList.add('fa-bars');
-        icon.classList.remove('fa-times');
+if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+        const isExpanded = navLinks.classList.contains('active');
+        setNavExpanded(!isExpanded);
     });
-});
+
+    // Close on link click
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => setNavExpanded(false));
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+            setNavExpanded(false);
+            navToggle.focus();
+        }
+    });
+}
 
 // ===== Active Nav Link =====
 const sections = document.querySelectorAll('section[id]');
@@ -131,8 +163,12 @@ window.addEventListener('scroll', () => {
         const navLink = document.querySelector(`.nav-links a[href="#${sectionId}"]`);
 
         if (navLink && scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.classList.remove('active');
+                a.removeAttribute('aria-current');
+            });
             navLink.classList.add('active');
+            navLink.setAttribute('aria-current', 'page');
         }
     });
 });

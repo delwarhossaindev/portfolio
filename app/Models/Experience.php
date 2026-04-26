@@ -23,6 +23,12 @@ class Experience extends Model
         'sort_order' => 'integer',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(fn () => \Illuminate\Support\Facades\Cache::forget('portfolio.experiences'));
+        static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('portfolio.experiences'));
+    }
+
     public function techList(): array
     {
         return collect(explode(',', (string) $this->technologies))

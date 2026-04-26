@@ -25,15 +25,18 @@
                 <i class="fas fa-lock-open"></i>
                 Login to manage your portfolio content
             </p>
-            <div class="alert alert-info">
-                <strong><i class="fas fa-user-circle"></i> Email:</strong> admin@demo.com<br>
-                <strong><i class="fas fa-key"></i> Password:</strong> 123456
-            </div>
 
-            <form action="{{ route('admin.login.submit') }}" method="post">
+            @if(session('lockout'))
+                <div class="alert alert-warning">
+                    <i class="fas fa-clock"></i> {{ session('lockout') }}
+                </div>
+            @endif
+
+            <form action="{{ route('admin.login.submit') }}" method="post" autocomplete="on">
                 @csrf
                 <div class="input-group mb-3">
-                    <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}" required>
+                    <input type="email" name="email" class="form-control" placeholder="Email"
+                           value="{{ old('email') }}" autocomplete="username" required>
                     <div class="input-group-append">
                         <div class="input-group-text"><span class="fas fa-envelope"></span></div>
                     </div>
@@ -41,16 +44,22 @@
                 @error('email') <small class="text-danger d-block mb-2">{{ $message }}</small> @enderror
 
                 <div class="input-group mb-3">
-                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    <input type="password" name="password" class="form-control" placeholder="Password"
+                           autocomplete="current-password" required>
                     <div class="input-group-append">
                         <div class="input-group-text"><span class="fas fa-lock"></span></div>
                     </div>
                 </div>
 
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                    <label class="form-check-label" for="remember">Remember me</label>
+                </div>
+
                 <div class="row">
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-login"></i> Sign In
+                            <i class="fas fa-sign-in-alt"></i> Sign In
                         </button>
                     </div>
                 </div>

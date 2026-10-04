@@ -28,14 +28,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="fas fa-key mr-1"></i> Password {{ $item->exists ? '(leave blank to keep current)' : '' }}</label>
-                            <input type="password" name="password" class="form-control" {{ $item->exists ? '' : 'required' }} minlength="8" autocomplete="new-password">
-                            <small class="form-text">At least 8 characters, with an uppercase letter, a lowercase letter and a number (e.g. <code>Admin2026</code>).</small>
+                            <input type="password" name="password" class="form-control" {{ $item->exists ? '' : 'required' }} minlength="6" autocomplete="new-password">
+                            <small class="form-text">At least 6 characters. Type it again below to confirm.</small>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="fas fa-key mr-1"></i> Confirm Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" {{ $item->exists ? '' : 'required' }} minlength="8" autocomplete="new-password">
+                            <input type="password" name="password_confirmation" class="form-control" {{ $item->exists ? '' : 'required' }} minlength="6" autocomplete="new-password">
                         </div>
                     </div>
                     <div class="col-12">

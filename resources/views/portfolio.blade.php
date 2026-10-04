@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v={{ filemtime(public_path('css/portfolio.css')) }}">
 
     {{-- JSON-LD: Person schema --}}
     <script type="application/ld+json">
@@ -189,8 +189,6 @@
                             <button type="submit" class="nav-signin-btn"><i class="fas fa-right-from-bracket" aria-hidden="true"></i> Logout</button>
                         </form>
                     </li>
-                @else
-                    <li><a href="{{ route('admin.login') }}" class="nav-signin"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</a></li>
                 @endauth
             </ul>
             <div class="nav-right">
@@ -599,6 +597,9 @@
             <div class="footer-bottom">
                 <p>&copy; {{ date('Y') }} {{ $content->hero_name }}. All Rights Reserved.</p>
                 <span class="built-with">Built with <i class="fas fa-heart" aria-label="love"></i> using Laravel</span>
+                @guest
+                    <a href="{{ route('admin.login') }}" class="footer-signin"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</a>
+                @endguest
             </div>
         </div>
     </footer>
@@ -623,6 +624,6 @@
             setTimeout(hide, 4000);
         })();
     </script>
-    <script src="{{ asset('js/portfolio.js') }}" defer></script>
+    <script src="{{ asset('js/portfolio.js') }}?v={{ filemtime(public_path('js/portfolio.js')) }}" defer></script>
 </body>
 </html>

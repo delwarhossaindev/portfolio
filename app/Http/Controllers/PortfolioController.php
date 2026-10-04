@@ -187,17 +187,23 @@ class PortfolioController extends Controller
     public function contact(Request $request)
     {
         // Honeypot - if "website" field is filled, treat as bot
+        $successMessage = 'Message sent successfully! I will get back to you soon.';
+
         if (filled($request->input('website'))) {
-            return back()->with('success', 'Message sent successfully!');
+            return $request->expectsJson()
+                ? response()->json(['message' => $successMessage])
+                : back()->with('success', $successMessage);
         }
 
         // Rate limit: 3 submissions per hour per IP
         $rateKey = 'contact:' . $request->ip();
         if (RateLimiter::tooManyAttempts($rateKey, 3)) {
             $minutes = ceil(RateLimiter::availableIn($rateKey) / 60);
-            return back()
-                ->withInput()
-                ->withErrors(['message' => "Too many messages sent. Please try again in {$minutes} minutes."]);
+            $error = "Too many messages sent. Please try again in {$minutes} minutes.";
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $error], 429)
+                : back()->withInput()->withErrors(['message' => $error]);
         }
 
         $validated = $request->validate([
@@ -213,9 +219,12 @@ class PortfolioController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        $this->sendContactNotification($contact);
+        // Send the email after the response is delivered so the visitor isn't kept waiting on SMTP.
+        app()->terminating(fn () => $this->sendContactNotification($contact));
 
-        return back()->with('success', 'Message sent successfully! I will get back to you soon.');
+        return $request->expectsJson()
+            ? response()->json(['message' => $successMessage])
+            : back()->with('success', $successMessage);
     }
 
     private function sendContactNotification(Contact $contact): void

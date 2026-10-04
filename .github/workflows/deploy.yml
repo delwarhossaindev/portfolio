@@ -5,8 +5,27 @@ on:
 name: 🚀 Deploy website on push
 
 jobs:
+  # Nothing is uploaded unless the test suite passes.
+  tests:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: pdo_sqlite, gd
+        coverage: none
+    - name: Install Composer dependencies
+      run: composer install --no-interaction --no-progress --prefer-dist
+    - name: Prepare environment
+      run: cp .env.example .env && php artisan key:generate
+    - name: Run tests
+      run: php artisan test
+
   web-deploy:
     name: 🎉 Deploy
+    needs: tests
     runs-on: ubuntu-latest
     steps:
     # The whole history is fetched so each file can be stamped with the time
@@ -79,6 +98,8 @@ jobs:
           --exclude '^\.phpunit\.result\.cache$'
           --exclude '^tests/'
           --exclude '\.sqlite$'
+          --exclude '\.backup$'
+          --exclude '\.bak$'
         "
         # One line, or lftp reads each --exclude as a command of its own and
         # runs a bare `mirror` with nothing excluded.
@@ -111,3 +132,26 @@ jobs:
           grep -vi "password" /tmp/sftp-debug.log | tail -n 40
         fi
         exit $rc
+
+    # Optional: run post-deploy commands over SSH (same login as SFTP).
+    # Turn it on with a repository variable RUN_POST_DEPLOY=true
+    # (Settings → Secrets and variables → Actions → Variables). Off by default
+    # because some cPanel accounts only allow SFTP, not a shell.
+    - name: ⚙️ Migrate & clear caches over SSH
+      if: vars.RUN_POST_DEPLOY == 'true'
+      env:
+        SSHPASS: ${{ secrets.SFTP_PASSWORD }}
+        SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+        SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+        SFTP_PATH: ${{ secrets.SFTP_PATH }}
+      run: |
+        SFTP_PATH=$(printf '%s' "$SFTP_PATH" | tr -d "\"' \r\n")
+        sudo apt-get install -y -qq sshpass
+        sshpass -e ssh -o StrictHostKeyChecking=accept-new -p 22 "$SFTP_USERNAME@$SFTP_SERVER" "
+          set -e
+          cd '$SFTP_PATH'
+          if command -v composer >/dev/null 2>&1; then composer install --no-dev --no-interaction --optimize-autoloader; fi
+          php artisan migrate --force
+          php artisan optimize:clear
+          php artisan optimize
+        "

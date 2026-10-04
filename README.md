@@ -140,9 +140,9 @@ php artisan serve
 
 Open **http://localhost:8000** for the site and **/admin/login** for the dashboard.
 
-> [!WARNING]
-> The seeder creates a demo admin (`admin@demo.com` / `123456`).
-> **Change this password right after the first login** — never deploy with it.
+> [!TIP]
+> The seeder creates the first admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`.
+> Leave the password empty and a random one is generated and printed once.
 
 ### 🔄 Coming from SQLite?
 

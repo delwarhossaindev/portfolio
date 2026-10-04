@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
+        $middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        ]);
+
         // Set from JavaScript by the admin theme toggle, so it is never encrypted.
         $middleware->encryptCookies(except: ['admin_theme']);
 

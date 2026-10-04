@@ -296,3 +296,115 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
+// ===== Toast notifications =====
+function showToast(message, type = 'success') {
+    let stack = document.querySelector('.toast-stack');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.className = 'toast-stack';
+        stack.setAttribute('aria-live', 'polite');
+        document.body.appendChild(stack);
+    }
+
+    const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    toast.innerHTML = `<i class="fas ${icons[type] || icons.success}" aria-hidden="true"></i>
+        <span class="toast-text"></span>
+        <button type="button" class="toast-close" aria-label="Close">&times;</button>`;
+    toast.querySelector('.toast-text').textContent = message;
+    stack.appendChild(toast);
+
+    const close = () => {
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 300);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', close);
+    setTimeout(close, 5000);
+}
+
+// ===== Contact form (AJAX, no page reload) =====
+(function () {
+    const form = document.querySelector('.contact-form');
+    if (!form) return;
+
+    const button = form.querySelector('.btn-submit');
+    const buttonHtml = button.innerHTML;
+
+    function clearErrors() {
+        form.querySelectorAll('.form-error').forEach(el => el.remove());
+        form.querySelectorAll('[aria-invalid]').forEach(el => {
+            el.removeAttribute('aria-invalid');
+            el.removeAttribute('aria-describedby');
+        });
+        // Server-rendered alerts from a previous non-JS submit
+        form.parentElement.querySelectorAll('.alert-success, .alert-error').forEach(el => el.remove());
+    }
+
+    function showFieldErrors(errors) {
+        let first = null;
+        Object.entries(errors).forEach(([name, messages]) => {
+            const field = form.querySelector(`[name="${name}"]`);
+            if (!field) return;
+            const id = `${field.id}-error`;
+            const span = document.createElement('span');
+            span.className = 'form-error';
+            span.id = id;
+            span.setAttribute('role', 'alert');
+            span.textContent = messages[0];
+            field.insertAdjacentElement('afterend', span);
+            field.setAttribute('aria-invalid', 'true');
+            field.setAttribute('aria-describedby', id);
+            first = first || field;
+        });
+        if (first) first.focus();
+    }
+
+    // Clear a field's error as soon as the visitor edits it
+    form.addEventListener('input', e => {
+        if (e.target.getAttribute('aria-invalid') !== 'true') return;
+        e.target.removeAttribute('aria-invalid');
+        document.getElementById(`${e.target.id}-error`)?.remove();
+    });
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        clearErrors();
+
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Sending…';
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                showToast(data.message || 'Message sent successfully!', 'success');
+                form.reset();
+            } else if (response.status === 422 && data.errors) {
+                showFieldErrors(data.errors);
+                showToast('Please fix the highlighted fields.', 'error');
+            } else if (response.status === 429) {
+                showToast(data.message || 'Too many messages. Please try again later.', 'error');
+            } else if (response.status === 419) {
+                showToast('Your session expired. Please refresh the page and try again.', 'error');
+            } else {
+                showToast(data.message || 'Something went wrong. Please try again.', 'error');
+            }
+        } catch (err) {
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = buttonHtml;
+        }
+    });
+})();

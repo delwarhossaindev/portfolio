@@ -27,3 +27,7 @@ Thumbs.db
 # Local SQLite copies (the app runs on MySQL)
 /database/*.sqlite
 /database/*.sqlite-journal
+
+# Backup copies (never deploy these)
+*.backup
+*.bak

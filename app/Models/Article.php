@@ -102,7 +102,8 @@ class Article extends Model
     public function renderedContent(): string
     {
         return Str::markdown((string) $this->content, [
-            'html_input' => 'allow',
+            // Raw HTML in an article is shown as text, never executed (prevents stored XSS).
+            'html_input' => 'escape',
             'allow_unsafe_links' => false,
         ]);
     }

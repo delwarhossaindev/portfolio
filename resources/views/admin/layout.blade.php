@@ -784,7 +784,7 @@
                         {{ $adminUser?->email }}
                     </div>
                     <div class="dropdown-divider"></div>
-                    @if($adminUser)
+                    @if($adminUser?->hasRole('admin'))
                         <a href="{{ route('admin.users.edit', $adminUser) }}" class="dropdown-item"><i class="far fa-user mr-2"></i> My account</a>
                     @endif
                     <a href="{{ route('admin.home.edit') }}" class="dropdown-item"><i class="fas fa-sliders mr-2"></i> Site content</a>
@@ -852,6 +852,7 @@
                         </a>
                     </li>
 
+                    @role('admin')
                     <li class="nav-header">Access</li>
                     <li class="nav-item has-treeview {{ $userMgmtOpen ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ $userMgmtOpen ? 'active' : '' }}">
@@ -893,6 +894,7 @@
                             </a>
                         </li>
                     @endif
+                    @endrole
                 </ul>
             </nav>
 

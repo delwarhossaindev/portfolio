@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v={{ filemtime(public_path('css/portfolio.css')) }}">
 
     {{-- JSON-LD: BreadcrumbList --}}
     <script type="application/ld+json">
@@ -90,8 +90,6 @@
                 <li><a href="{{ url('/') }}#contact">Contact</a></li>
                 @auth
                     <li><a href="{{ route('admin.dashboard') }}"><i class="fas fa-gauge"></i> Dashboard</a></li>
-                @else
-                    <li><a href="{{ route('admin.login') }}" class="nav-signin"><i class="fas fa-right-to-bracket"></i> Sign In</a></li>
                 @endauth
             </ul>
             <div class="nav-right">
@@ -297,6 +295,9 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; {{ date('Y') }} {{ $content->hero_name }}. All Rights Reserved.</p>
+            @guest
+                <a href="{{ route('admin.login') }}" class="footer-signin"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</a>
+            @endguest
         </div>
     </footer>
 
@@ -305,6 +306,6 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <script src="{{ asset('js/portfolio.js') }}"></script>
+    <script src="{{ asset('js/portfolio.js') }}?v={{ filemtime(public_path('js/portfolio.js')) }}"></script>
 </body>
 </html>

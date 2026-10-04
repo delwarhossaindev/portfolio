@@ -46,45 +46,51 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-    // Terminal panel - DEVELOPMENT ONLY (executes shell commands).
-    // Disabled in production regardless of auth state.
-    if (app()->environment('local') && config('app.debug')) {
-        Route::get('/terminal-panel', [PortfolioController::class, 'terminalPanel'])->name('terminal.panel');
-        Route::post('/terminal-panel/run', [PortfolioController::class, 'runTerminalCommand'])
-            ->middleware('throttle:10,1')
-            ->name('terminal.run');
-    }
+    // Content management - admins and editors.
+    Route::middleware('role:admin|editor')->group(function () {
+        Route::get('/admin/dashboard', [PortfolioController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('/admin/home', [PortfolioController::class, 'homeEdit'])->name('admin.home.edit');
+        Route::put('/admin/home', [PortfolioController::class, 'homeUpdate'])->name('admin.home.update');
 
-    Route::get('/admin/dashboard', [PortfolioController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/home', [PortfolioController::class, 'homeEdit'])->name('admin.home.edit');
-    Route::put('/admin/home', [PortfolioController::class, 'homeUpdate'])->name('admin.home.update');
+        Route::resource('admin/experiences', ExperienceController::class)
+            ->except(['show'])
+            ->names('admin.experiences');
 
-    Route::resource('admin/experiences', ExperienceController::class)
-        ->except(['show'])
-        ->names('admin.experiences');
+        Route::resource('admin/projects', ProjectController::class)
+            ->except(['show'])
+            ->names('admin.projects');
 
-    Route::resource('admin/projects', ProjectController::class)
-        ->except(['show'])
-        ->names('admin.projects');
+        Route::resource('admin/articles', AdminArticleController::class)
+            ->except(['show'])
+            ->names('admin.articles');
 
-    Route::resource('admin/articles', AdminArticleController::class)
-        ->except(['show'])
-        ->names('admin.articles');
+        Route::get('/admin/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
+        Route::post('/admin/contacts/mark-all-read', [ContactController::class, 'markAllRead'])->name('admin.contacts.markAllRead');
+        Route::get('/admin/contacts/{contact}', [ContactController::class, 'show'])->name('admin.contacts.show');
+        Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
+    });
 
-    Route::get('/admin/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
-    Route::post('/admin/contacts/mark-all-read', [ContactController::class, 'markAllRead'])->name('admin.contacts.markAllRead');
-    Route::get('/admin/contacts/{contact}', [ContactController::class, 'show'])->name('admin.contacts.show');
-    Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
+    // Access control and developer tools - admins only.
+    Route::middleware('role:admin')->group(function () {
+        // Terminal panel - DEVELOPMENT ONLY (executes shell commands).
+        // Disabled in production regardless of auth state.
+        if (app()->environment('local') && config('app.debug')) {
+            Route::get('/terminal-panel', [PortfolioController::class, 'terminalPanel'])->name('terminal.panel');
+            Route::post('/terminal-panel/run', [PortfolioController::class, 'runTerminalCommand'])
+                ->middleware('throttle:10,1')
+                ->name('terminal.run');
+        }
 
-    Route::resource('admin/users', UserController::class)
-        ->except(['show'])
-        ->names('admin.users');
+        Route::resource('admin/users', UserController::class)
+            ->except(['show'])
+            ->names('admin.users');
 
-    Route::resource('admin/roles', RoleController::class)
-        ->except(['show'])
-        ->names('admin.roles');
+        Route::resource('admin/roles', RoleController::class)
+            ->except(['show'])
+            ->names('admin.roles');
 
-    Route::resource('admin/permissions', PermissionController::class)
-        ->except(['show'])
-        ->names('admin.permissions');
+        Route::resource('admin/permissions', PermissionController::class)
+            ->except(['show'])
+            ->names('admin.permissions');
+    });
 });

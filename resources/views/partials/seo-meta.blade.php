@@ -40,7 +40,9 @@
 @endif
 
 {{-- Favicon set --}}
-<link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-<link rel="alternate icon" href="{{ asset('favicon.ico') }}">
-<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+<link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}?v=2">
+<link rel="alternate icon" href="{{ asset('favicon.ico') }}?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}?v=2">
 <meta name="theme-color" content="#6366f1">
+

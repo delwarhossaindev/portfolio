@@ -1,11 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <!-- Background Gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1326"/>
+      <stop offset="100%" stop-color="#050711"/>
+    </linearGradient>
+
+    <!-- Border Ring Gradient -->
+    <linearGradient id="border" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#a855f7"/>
       <stop offset="100%" stop-color="#ec4899"/>
     </linearGradient>
+
+    <!-- D Stem Gradient (Cyan to Indigo) -->
+    <linearGradient id="stemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+
+    <!-- D Arc Gradient (Indigo to Magenta) -->
+    <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="50%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+
+    <!-- Ambient Glow -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle"
-        font-family="'Fira Code', ui-monospace, monospace" font-size="32" font-weight="700" fill="#ffffff">D</text>
+
+  <!-- Background Base Squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)"/>
+
+  <!-- Subtle Ambient Glow -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#glow)"/>
+
+  <!-- Glowing Border -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="none" stroke="url(#border)" stroke-width="2.2" stroke-opacity="0.9"/>
+
+  <!-- Left Stem of D -->
+  <rect x="16" y="16" width="6" height="32" rx="3" fill="url(#stemGrad)"/>
+
+  <!-- Curved Loop of D -->
+  <path d="M 22 19 C 34 19 44 24 44 32 C 44 40 34 45 22 45" fill="none" stroke="url(#arcGrad)" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Inner Code Terminal Prompt Accent '>' -->
+  <path d="M 27 28 L 32 32 L 27 36" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

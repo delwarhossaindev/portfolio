@@ -23,3 +23,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local SQLite copies (the app runs on MySQL)
+/database/*.sqlite
+/database/*.sqlite-journal

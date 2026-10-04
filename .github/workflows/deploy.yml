@@ -1,0 +1,113 @@
+on:
+  push:
+    branches: [main]
+
+name: 🚀 Deploy website on push
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    # The whole history is fetched so each file can be stamped with the time
+    # of the commit that last touched it — see the next step.
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # A fresh checkout gives every file the same "just now" timestamp, which
+    # would make the upload below send every file on every push. With the
+    # last commit time on each file instead, only the files a push actually
+    # changed are newer than the server's copies.
+    - name: 🕰 Stamp files with their last commit time
+      run: |
+        git log --format='#%ct' --name-only --diff-filter=AM -- . | awk '
+          /^#/ { ts = substr($0, 2); next }
+          NF && !($0 in seen) { seen[$0] = 1; print ts "\t" $0 }
+        ' | while IFS=$'\t' read -r ts path; do
+          [ -f "$path" ] && touch -d "@$ts" "$path"
+        done
+
+    # public/build is not in the repository, so the Vite assets are built
+    # here and uploaded with the rest; without them every page fails with
+    # "Vite manifest not found". Vite 8 needs Node 20.19+ / 22.12+.
+    - name: 🛠 Build frontend assets
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+    - run: npm ci && npm run build
+
+    # SFTP on port 22, with SFTP_SERVER, SFTP_USERNAME (the cPanel login),
+    # SFTP_PASSWORD and SFTP_PATH (full path of the folder the Laravel app
+    # lives in, e.g. /home/<user>/public_html). Plain FTP is not used: the
+    # host's firewall drops its passive data connections.
+    #
+    # Nothing is deleted on the server — vendor/, .env, storage/ and the
+    # MySQL database live there and are not in the repository. Migrations
+    # are run on the server by hand after a deploy
+    # (`php artisan migrate --force`, `php artisan optimize:clear`).
+    - name: 📂 Sync files over SFTP
+      env:
+        SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+        SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+        SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+        SFTP_PATH: ${{ secrets.SFTP_PATH }}
+      run: |
+        for name in SFTP_SERVER SFTP_USERNAME SFTP_PASSWORD SFTP_PATH; do
+          if [ -z "${!name}" ]; then
+            echo "::error::The $name secret is not set (Settings → Secrets and variables → Actions)"
+            exit 1
+          fi
+        done
+
+        # The path goes to lftp unquoted — quoting it made lftp create a
+        # folder literally named " and upload the site inside it — so any
+        # quotes or spaces pasted into the secret are stripped here.
+        SFTP_PATH=$(printf '%s' "$SFTP_PATH" | tr -d "\"' \r\n")
+
+        sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+        EXCLUDES="
+          --exclude '^\.git'
+          --exclude '/\.git'
+          --exclude 'node_modules/'
+          --exclude '^docs/'
+          --exclude '^CLAUDE\.md$'
+          --exclude '^phpunit\.xml$'
+          --exclude '^\.phpunit\.result\.cache$'
+          --exclude '^tests/'
+          --exclude '\.sqlite$'
+        "
+        # One line, or lftp reads each --exclude as a command of its own and
+        # runs a bare `mirror` with nothing excluded.
+        EXCLUDES=$(printf '%s' "$EXCLUDES" | tr '\n' ' ')
+
+        # lftp's own trace goes to a file and its tail is printed on failure,
+        # since "max-retries exceeded" on its own says nothing about why.
+        # A single connection: parallel SSH sessions trip cPGuard's
+        # connection-burst rate limit on the host.
+        set +e
+        lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" "sftp://$SFTP_SERVER:22" -e "
+          set cmd:fail-exit yes
+          debug -o /tmp/sftp-debug.log -t 3
+          set sftp:auto-confirm yes
+          set net:max-retries 3
+          set net:timeout 60
+          cd $SFTP_PATH
+          mirror --reverse --only-newer --parallel=1 --verbose --log=/tmp/mirror.log $EXCLUDES . .
+          quit
+        "
+        rc=$?
+        if [ -f /tmp/mirror.log ]; then
+          echo "Uploaded: $(grep -c '^put' /tmp/mirror.log) files"
+          cat /tmp/mirror.log
+        else
+          echo "Nothing to upload — every file on the server is up to date"
+        fi
+        if [ $rc -ne 0 ] && [ -f /tmp/sftp-debug.log ]; then
+          echo "lftp trace (last 40 lines):"
+          grep -vi "password" /tmp/sftp-debug.log | tail -n 40
+        fi
+        exit $rc

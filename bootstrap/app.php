@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
+        // Set from JavaScript by the admin theme toggle, so it is never encrypted.
+        $middleware->encryptCookies(except: ['admin_theme']);
+
         // Redirect unauthenticated users to admin login (instead of the default "login" route)
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ContactSubmitted;
+use App\Models\Article;
 use App\Models\Contact;
 use App\Models\PortfolioContent;
 use App\Models\Experience;
@@ -399,6 +400,8 @@ class PortfolioController extends Controller
                 'featuredProjects' => Project::where('is_featured', true)->count(),
                 'activeExperiences' => Experience::where('is_active', true)->count(),
                 'activeProjects' => Project::where('is_active', true)->count(),
+                'articles' => Article::count(),
+                'publishedArticles' => Article::published()->count(),
                 'contentUpdatedAt' => optional($content->updated_at)?->diffForHumans() ?? 'N/A',
                 'lastLoginEmail' => auth()->user()?->email ?? 'N/A',
             ],

@@ -9,9 +9,19 @@ function applyTheme(theme) {
     }
 }
 
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'dark';
-applyTheme(savedTheme);
+// Load saved theme. The key is namespaced and the value validated because
+// localStorage is shared by every app on the same origin (e.g. localhost),
+// and an unknown data-theme leaves all theme colours undefined.
+const THEME_KEY = 'portfolio-theme';
+function readSavedTheme() {
+    try {
+        const value = localStorage.getItem(THEME_KEY);
+        return value === 'light' || value === 'dark' ? value : 'dark';
+    } catch (e) {
+        return 'dark';
+    }
+}
+applyTheme(readSavedTheme());
 
 if (themeSwitch) {
     themeSwitch.addEventListener('click', () => {
@@ -21,7 +31,7 @@ if (themeSwitch) {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
         applyTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
+        try { localStorage.setItem(THEME_KEY, newTheme); } catch (e) { /* storage blocked */ }
 
         setTimeout(() => {
             document.body.classList.remove('theme-transitioning');

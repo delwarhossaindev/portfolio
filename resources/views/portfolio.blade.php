@@ -228,7 +228,7 @@
                 <div class="hero-text">
                     <p class="hero-greeting">{{ $content->hero_greeting }}</p>
                     <h1 class="hero-name" id="hero-heading">{{ $content->hero_name }}</h1>
-                    <p class="hero-role">I'm a <span class="typed-text" id="typedText" data-roles="{{ $content->hero_roles }}" aria-live="polite"></span><span class="cursor" aria-hidden="true">|</span></p>
+                    <p class="hero-role"><span class="hero-role-prefix">I'm a&nbsp;</span><span class="typed-text" id="typedText" data-roles="{{ $content->hero_roles }}" aria-live="polite"></span><span class="cursor" aria-hidden="true">|</span></p>
                     <p class="hero-description">{{ $content->hero_description }}</p>
                     <div class="hero-social" aria-label="Social links">
                         <a href="{{ $content->linkedin_url }}" class="social-link" aria-label="LinkedIn profile (opens in new tab)" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
@@ -243,6 +243,7 @@
                 <div class="hero-image">
                     <div class="image-wrapper">
                         <div class="image-glow" aria-hidden="true"></div>
+                        <div class="image-glow-2" aria-hidden="true"></div>
                         @if($content->profile_image)
                             <img src="{{ asset('storage/' . $content->profile_image) }}"
                                  alt="Portrait of {{ $content->hero_name }}"
@@ -261,6 +262,19 @@
                                      width="340" height="340">
                             </picture>
                         @endif
+                        {{-- Floating info badges --}}
+                        <div class="hero-badge hero-badge-1" aria-hidden="true">
+                            <i class="fas fa-briefcase"></i>
+                            <span>5+ Years Exp.</span>
+                        </div>
+                        <div class="hero-badge hero-badge-2" aria-hidden="true">
+                            <i class="fas fa-circle" style="color:#22c55e;font-size:0.6rem;"></i>
+                            <span>Available for hire</span>
+                        </div>
+                        <div class="hero-badge hero-badge-3" aria-hidden="true">
+                            <i class="fas fa-code"></i>
+                            <span>Laravel &amp; Vue</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -87,15 +87,15 @@ if (typedTextElement) {
             charIndex++;
         }
 
-        let speed = isDeleting ? 50 : 100;
+        let speed = isDeleting ? 35 : 90;
 
         if (!isDeleting && charIndex === currentText.length) {
-            speed = 2000;
+            speed = 2200;
             isDeleting = true;
         } else if (isDeleting && charIndex === 0) {
             isDeleting = false;
             textIndex = (textIndex + 1) % texts.length;
-            speed = 500;
+            speed = 450;
         }
 
         setTimeout(typeText, speed);
@@ -266,13 +266,21 @@ statNumbers.forEach(stat => counterObserver.observe(stat));
 // ===== Particles =====
 const particlesContainer = document.getElementById('particles');
 
-for (let i = 0; i < 30; i++) {
+const particleColors = ['#6366f1', '#8b5cf6', '#ec4899', '#22d3ee', '#a5b4fc'];
+
+for (let i = 0; i < 40; i++) {
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.top = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 6 + 's';
-    particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+    const size = (1 + Math.random() * 3).toFixed(1);
+    particle.style.cssText = [
+        `left: ${Math.random() * 100}%`,
+        `top: ${Math.random() * 100}%`,
+        `width: ${size}px`,
+        `height: ${size}px`,
+        `background: ${particleColors[Math.floor(Math.random() * particleColors.length)]}`,
+        `animation-delay: ${(Math.random() * 8).toFixed(2)}s`,
+        `animation-duration: ${(5 + Math.random() * 6).toFixed(2)}s`,
+    ].join(';');
     particlesContainer.appendChild(particle);
 }
 

@@ -221,9 +221,14 @@ class PortfolioController extends Controller
     private function sendContactNotification(Contact $contact): void
     {
         try {
-            $recipient = $this->getPortfolioContent()->contact_email;
+            $recipient = config('mail.contact.to') ?: $this->getPortfolioContent()->contact_email;
+            $cc = config('mail.contact.cc');
             if ($recipient) {
-                Mail::to($recipient)->send(new ContactSubmitted($contact));
+                $mail = Mail::to($recipient);
+                if ($cc && strcasecmp($cc, $recipient) !== 0) {
+                    $mail->cc($cc);
+                }
+                $mail->send(new ContactSubmitted($contact));
             }
         } catch (\Throwable $e) {
             Log::error('Contact notification email failed', [

@@ -115,4 +115,19 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Contact Form Notifications
+    |--------------------------------------------------------------------------
+    |
+    | Where new contact-form messages are emailed. "to" falls back to the
+    | contact email set in the admin Home section; "cc" is optional.
+    |
+    */
+
+    'contact' => [
+        'to' => env('CONTACT_MAIL_TO'),
+        'cc' => env('CONTACT_MAIL_CC'),
+    ],
+
 ];

@@ -3527,3 +3527,91 @@ img {
     border-color: var(--accent);
 }
 .footer .container > .footer-signin { margin-top: 10px; }
+
+/* =====================================================================
+   Mobile polish (phones). Kept together at the end so it overrides the
+   breakpoints above without editing them.
+   ===================================================================== */
+@media (max-width: 768px) {
+    /* "I'm a <role>" was left-aligned while the rest of the hero is centred */
+    .hero-role { justify-content: center; }
+
+    /* Three stat cards side by side instead of a tall stack */
+    .about-stats {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .stat-item {
+        flex: 1 1 0;
+        width: auto;
+        max-width: 180px;
+        padding: 18px 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Floating badges covered the photo on small screens: keep only
+       "Available for hire", centred just below the picture. */
+    .hero-badge-1,
+    .hero-badge-3 { display: none; }
+
+    .hero-badge-2 {
+        top: auto;
+        bottom: -16px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: max-content;
+        padding: 6px 12px;
+        font-size: 0.72rem;
+        animation: none;
+    }
+
+    .hero-content { gap: 36px; }
+
+    /* Desktop section spacing (100-110px) leaves big empty bands on a phone */
+    .about-section,
+    .experience-section,
+    .projects-section,
+    .contact-section { padding: 64px 0; }
+
+    /* Project detail page */
+    .project-detail-hero { padding: 96px 0 24px; }
+    .project-detail-body { padding: 32px 0 48px; }
+    .project-detail-title { font-size: 1.6rem; }
+    .project-detail-tagline { font-size: 0.95rem; }
+    .project-detail-tech { margin-bottom: 8px; }
+}
+
+@media (max-width: 480px) {
+    .stat-item { padding: 14px 6px; border-radius: var(--radius-sm); }
+    .stat-number { font-size: 1.7rem; }
+    .stat-number::after { font-size: 1.05rem; }
+    .stat-label { font-size: 0.6rem; letter-spacing: 0.6px; }
+
+    /* Compact 4-column tech grid instead of tall 2-column cards */
+    .tech-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .tech-icon { padding: 12px 4px 10px; gap: 6px; }
+    .tech-icon img { width: 28px; height: 28px; }
+    .tech-name { font-size: 0.6rem; }
+
+    .timeline-date { white-space: normal; line-height: 1.45; }
+
+    /* Footer links in a wrapped row rather than a tall column */
+    .footer-links {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 20px;
+    }
+
+    .contact-form-wrapper { padding: 20px 16px; }
+}
+
+@media (max-width: 360px) {
+    .tech-grid { grid-template-columns: repeat(3, 1fr); }
+    .stat-label { font-size: 0.55rem; }
+}

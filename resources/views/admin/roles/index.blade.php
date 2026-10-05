@@ -48,7 +48,7 @@
                                     <a href="{{ route('admin.roles.edit', $item) }}" class="btn btn-edit">
                                         <i class="fas fa-pen-to-square mr-1"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.roles.destroy', $item) }}" onsubmit="return confirm('Delete this role?');">
+                                    <form method="POST" action="{{ route('admin.roles.destroy', $item) }}" data-confirm="Delete this role?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-delete">

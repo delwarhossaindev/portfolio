@@ -42,7 +42,7 @@
                                     <a href="{{ route('admin.permissions.edit', $item) }}" class="btn btn-edit">
                                         <i class="fas fa-pen-to-square mr-1"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.permissions.destroy', $item) }}" onsubmit="return confirm('Delete this permission?');">
+                                    <form method="POST" action="{{ route('admin.permissions.destroy', $item) }}" data-confirm="Delete this permission?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-delete">

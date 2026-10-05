@@ -46,7 +46,7 @@
                                     <a href="{{ route('admin.users.edit', $item) }}" class="btn btn-edit">
                                         <i class="fas fa-pen-to-square mr-1"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.users.destroy', $item) }}" onsubmit="return confirm('Delete this user?');">
+                                    <form method="POST" action="{{ route('admin.users.destroy', $item) }}" data-confirm="Delete this user?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-delete" {{ auth()->id() === $item->id ? 'disabled' : '' }}>

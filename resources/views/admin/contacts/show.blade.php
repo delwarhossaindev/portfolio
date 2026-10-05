@@ -32,7 +32,7 @@
             <a href="mailto:{{ $item->email }}?subject=Re: {{ $item->subject }}" class="btn btn-success">
                 <i class="fas fa-reply mr-1"></i> Reply via Email
             </a>
-            <form method="POST" action="{{ route('admin.contacts.destroy', $item) }}" onsubmit="return confirm('Delete this message?');">
+            <form method="POST" action="{{ route('admin.contacts.destroy', $item) }}" data-confirm="Delete this message?">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger">

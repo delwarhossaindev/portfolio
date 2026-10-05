@@ -54,7 +54,7 @@
                                     <a href="{{ route('admin.experiences.edit', $item) }}" class="btn btn-edit">
                                         <i class="fas fa-pen-to-square mr-1"></i> Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.experiences.destroy', $item) }}" onsubmit="return confirm('Delete this experience?');">
+                                    <form method="POST" action="{{ route('admin.experiences.destroy', $item) }}" data-confirm="Delete this experience?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-delete">

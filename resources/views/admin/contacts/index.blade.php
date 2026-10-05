@@ -58,7 +58,7 @@
                                     <a href="{{ route('admin.contacts.show', $item) }}" class="btn btn-view">
                                         <i class="fas fa-eye mr-1"></i> View
                                     </a>
-                                    <form method="POST" action="{{ route('admin.contacts.destroy', $item) }}" onsubmit="return confirm('Delete this message?');">
+                                    <form method="POST" action="{{ route('admin.contacts.destroy', $item) }}" data-confirm="Delete this message?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-delete">

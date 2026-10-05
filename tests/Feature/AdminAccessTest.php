@@ -65,6 +65,28 @@ class AdminAccessTest extends TestCase
         $this->actingAs($this->userWithRole())->get('/admin/dashboard')->assertForbidden();
     }
 
+    public function test_delete_uses_styled_confirm_and_success_shows_a_toast(): void
+    {
+        $admin = $this->userWithRole('admin');
+        $contact = \App\Models\Contact::create([
+            'name' => 'Jane', 'email' => 'jane@example.com', 'subject' => 'Hello', 'message' => 'Hello there, testing.',
+        ]);
+
+        $this->actingAs($admin)->get('/admin/contacts')
+            ->assertOk()
+            ->assertSee('data-confirm="Delete this message?"', false)
+            ->assertDontSee('return confirm(', false)
+            ->assertSee('id="confirm-dialog"', false);
+
+        $this->actingAs($admin)->from('/admin/contacts')
+            ->delete("/admin/contacts/{$contact->id}")
+            ->assertRedirect();
+
+        $this->actingAs($admin)->get('/admin/contacts')
+            ->assertSee('admin-toast-success', false)
+            ->assertSee('Message deleted.');
+    }
+
     public function test_admin_can_set_a_simple_password(): void
     {
         $admin = $this->userWithRole('admin');

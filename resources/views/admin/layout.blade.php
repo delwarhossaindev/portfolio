@@ -728,6 +728,107 @@
         }
 
         /* ------------------------------------------------------------------
+         * Toasts
+         * ------------------------------------------------------------------ */
+        .toast-stack {
+            position: fixed;
+            top: 76px;
+            right: 20px;
+            z-index: 1080;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 360px;
+            max-width: calc(100vw - 32px);
+            pointer-events: none;
+        }
+        .admin-toast {
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 14px 16px 16px;
+            border-radius: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            box-shadow: var(--shadow-lg);
+            color: var(--text-strong);
+            font-size: 13.5px;
+            line-height: 1.45;
+            animation: toast-in 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+        }
+        .admin-toast > i { font-size: 17px; margin-top: 1px; }
+        .admin-toast-success > i { color: var(--success); }
+        .admin-toast-error > i { color: var(--danger); }
+        .admin-toast-text { flex: 1; }
+        .admin-toast-close {
+            background: none;
+            border: 0;
+            color: var(--muted);
+            font-size: 20px;
+            line-height: 1;
+            padding: 0 2px;
+            cursor: pointer;
+        }
+        .admin-toast-close:hover { color: var(--text-strong); }
+        .admin-toast-progress {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 100%;
+            transform-origin: left;
+            animation: toast-progress 4.5s linear forwards;
+        }
+        .admin-toast-success .admin-toast-progress { background: var(--success); }
+        .admin-toast-error .admin-toast-progress { background: var(--danger); }
+        .admin-toast.is-paused .admin-toast-progress { animation-play-state: paused; }
+        .admin-toast.is-leaving { animation: toast-out 0.25s ease forwards; }
+        @keyframes toast-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+        @keyframes toast-out { to { opacity: 0; transform: translateX(24px); } }
+        @keyframes toast-progress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+        /* ------------------------------------------------------------------
+         * Confirm dialog
+         * ------------------------------------------------------------------ */
+        .confirm-dialog {
+            width: 400px;
+            max-width: calc(100vw - 32px);
+            padding: 28px 26px 22px;
+            border: 1px solid var(--border-strong);
+            border-radius: 16px;
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        .confirm-dialog[open] { animation: dialog-in 0.2s ease both; }
+        .confirm-dialog::backdrop {
+            background: rgba(5, 7, 15, 0.6);
+            backdrop-filter: blur(3px);
+        }
+        .confirm-icon {
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--danger-text);
+            background: rgba(239, 68, 68, 0.12);
+            box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.06);
+        }
+        .confirm-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; color: var(--text-strong); }
+        .confirm-message { margin: 0 0 22px; color: var(--muted); font-size: 13.5px; }
+        .confirm-actions { display: flex; gap: 10px; }
+        .confirm-actions .btn { flex: 1; padding: 10px 16px; }
+        @keyframes dialog-in { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+        /* ------------------------------------------------------------------
          * Footer
          * ------------------------------------------------------------------ */
         .main-footer {
@@ -939,13 +1040,6 @@
 
         <section class="content">
             <div class="container-fluid">
-                @if(session('admin_success'))
-                    <div class="alert alert-success" role="status" data-autohide>
-                        <i class="fas fa-circle-check"></i>
-                        <div>{{ session('admin_success') }}</div>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
-                    </div>
-                @endif
                 @if($errors->any())
                     <div class="alert alert-danger" role="alert">
                         <i class="fas fa-triangle-exclamation"></i>
@@ -970,6 +1064,29 @@
         <span id="admin-clock" class="d-none d-sm-inline"></span>
     </footer>
 </div>
+
+{{-- Toasts. Server-rendered so a flash message shows even if JavaScript fails. --}}
+<div class="toast-stack" id="toast-stack" aria-live="polite">
+    @if(session('admin_success'))
+        <div class="admin-toast admin-toast-success" role="status">
+            <i class="fas fa-circle-check"></i>
+            <span class="admin-toast-text">{{ session('admin_success') }}</span>
+            <button type="button" class="admin-toast-close" aria-label="Dismiss">&times;</button>
+            <span class="admin-toast-progress"></span>
+        </div>
+    @endif
+</div>
+
+{{-- Confirmation dialog for forms marked with data-confirm="Question?" --}}
+<dialog class="confirm-dialog" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <div class="confirm-icon"><i class="fas fa-trash-can"></i></div>
+    <h2 class="confirm-title" id="confirm-title">Are you sure?</h2>
+    <p class="confirm-message" id="confirm-message">This can't be undone.</p>
+    <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" data-confirm-cancel>Cancel</button>
+        <button type="button" class="btn btn-danger" data-confirm-ok><i class="fas fa-trash-can mr-1"></i> Delete</button>
+    </div>
+</dialog>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
@@ -983,10 +1100,78 @@
         setInterval(tick, 30000);
     })();
 
+    /* Toasts: window.adminToast('Saved', 'success' | 'error'). Flash messages are
+       rendered by the server into #toast-stack and wired up here. */
     (function () {
-        document.querySelectorAll('[data-autohide]').forEach(function (el) {
-            setTimeout(function () { $(el).fadeOut(300); }, 5000);
+        const stack = document.getElementById('toast-stack');
+        const DURATION = 4500;
+
+        function arm(toast) {
+            const close = () => {
+                toast.classList.add('is-leaving');
+                setTimeout(() => toast.remove(), 250);
+            };
+            toast.querySelector('.admin-toast-close')?.addEventListener('click', close);
+
+            // Pause the countdown while the pointer is over the toast.
+            let timer = setTimeout(close, DURATION);
+            toast.addEventListener('mouseenter', () => { clearTimeout(timer); toast.classList.add('is-paused'); });
+            toast.addEventListener('mouseleave', () => { timer = setTimeout(close, 1500); toast.classList.remove('is-paused'); });
+        }
+
+        window.adminToast = function (message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'admin-toast admin-toast-' + type;
+            toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            toast.innerHTML = '<i class="fas ' + (type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check') + '"></i>'
+                + '<span class="admin-toast-text"></span>'
+                + '<button type="button" class="admin-toast-close" aria-label="Dismiss">&times;</button>'
+                + '<span class="admin-toast-progress"></span>';
+            toast.querySelector('.admin-toast-text').textContent = message;
+            stack.appendChild(toast);
+            arm(toast);
+        };
+
+        stack.querySelectorAll('.admin-toast').forEach(arm);
+    })();
+
+    /* Styled replacement for window.confirm(): any <form data-confirm="Question?">
+       asks first. Falls back to the native confirm() where <dialog> is missing. */
+    (function () {
+        const dialog = document.getElementById('confirm-dialog');
+        const title = document.getElementById('confirm-title');
+        const message = document.getElementById('confirm-message');
+        let pendingForm = null;
+
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (!form.matches('form[data-confirm]') || form.dataset.confirmed === '1') return;
+
+            e.preventDefault();
+            if (typeof dialog.showModal !== 'function') {
+                if (window.confirm(form.dataset.confirm)) { form.dataset.confirmed = '1'; form.submit(); }
+                return;
+            }
+
+            pendingForm = form;
+            title.textContent = form.dataset.confirm;
+            message.textContent = form.dataset.confirmDetail || "This can't be undone.";
+            dialog.showModal();
+            dialog.querySelector('[data-confirm-cancel]').focus(); // safe default for a destructive action
         });
+
+        dialog.querySelector('[data-confirm-ok]').addEventListener('click', function () {
+            if (!pendingForm) return;
+            pendingForm.dataset.confirmed = '1';
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-1"></i> Deleting…';
+            pendingForm.submit();
+        });
+
+        dialog.querySelector('[data-confirm-cancel]').addEventListener('click', () => dialog.close());
+        // Click on the dimmed backdrop closes it, like other dialogs.
+        dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+        dialog.addEventListener('close', () => { pendingForm = null; });
     })();
 
     (function () {

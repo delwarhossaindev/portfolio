@@ -496,6 +496,21 @@
         }
         textarea.form-control { min-height: 96px; line-height: 1.55; }
         .form-control::placeholder { color: var(--muted); opacity: 0.7; }
+        /* Browser autofill paints a light-blue background that ignores our theme,
+           leaving white text on pale blue. Repaint it with an inset shadow. */
+        .form-control:-webkit-autofill,
+        .form-control:-webkit-autofill:hover {
+            -webkit-text-fill-color: var(--text-strong) !important;
+            caret-color: var(--text-strong);
+            -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset !important;
+            box-shadow: 0 0 0 1000px var(--surface-2) inset !important;
+            transition: background-color 9999s ease-out 0s;
+        }
+        .form-control:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--text-strong) !important;
+            -webkit-box-shadow: 0 0 0 1000px var(--surface) inset, 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+            box-shadow: 0 0 0 1000px var(--surface) inset, 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+        }
         .form-control:focus, .custom-select:focus {
             border-color: var(--primary) !important;
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;

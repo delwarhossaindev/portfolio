@@ -129,6 +129,18 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
         }
+        /* Keep saved-login autofill dark instead of the browser's pale blue */
+        .control input:-webkit-autofill,
+        .control input:-webkit-autofill:hover {
+            -webkit-text-fill-color: #fff !important;
+            caret-color: #fff;
+            -webkit-box-shadow: 0 0 0 1000px var(--field) inset !important;
+            transition: background-color 9999s ease-out 0s;
+        }
+        .control input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff !important;
+            -webkit-box-shadow: 0 0 0 1000px var(--field) inset, 0 0 0 4px rgba(99, 102, 241, 0.18) !important;
+        }
         .control input[aria-invalid="true"] { border-color: rgba(239, 68, 68, 0.6); }
         .peek {
             position: absolute;

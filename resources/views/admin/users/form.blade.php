@@ -16,13 +16,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="fas fa-user mr-1"></i> Name</label>
-                            <input name="name" class="form-control" value="{{ old('name', $item->name) }}" required>
+                            <input name="name" class="form-control" value="{{ old('name', $item->name) }}" required autocomplete="off">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="fas fa-at mr-1"></i> Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email', $item->email) }}" required>
+                            {{-- autocomplete off: this edits another account, so the browser must not fill in the admin's own login --}}
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $item->email) }}" required autocomplete="off">
                         </div>
                     </div>
                     <div class="col-md-6">

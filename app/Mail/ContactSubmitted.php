@@ -32,6 +32,7 @@ class ContactSubmitted extends Mailable
     {
         return new Content(
             view: 'emails.contact-submitted',
+            text: 'emails.contact-submitted-text',
             with: ['contact' => $this->contact],
         );
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use App\Support\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -98,7 +99,7 @@ class ArticleController extends Controller
             if ($article->cover_image) {
                 Storage::disk('public')->delete($article->cover_image);
             }
-            $article->cover_image = $request->file('cover_image')->store('articles/covers', 'public');
+            $article->cover_image = ImageOptimizer::store($request->file('cover_image'), 'articles/covers', 1600);
         }
     }
 }

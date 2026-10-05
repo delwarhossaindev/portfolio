@@ -1,42 +1,46 @@
 <?php
 
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HomeContentController;
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', [PortfolioController::class, 'index']);
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+/*
+|--------------------------------------------------------------------------
+| Public site
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', [PortfolioController::class, 'index'])->name('home');
 Route::get('/projects/{project:slug}', [PortfolioController::class, 'showProject'])->name('projects.show');
-// Blog routes - disabled for now, uncomment to enable
-// Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-// Route::get('/blog/{article:slug}', [BlogController::class, 'show'])->name('blog.show');
-Route::post('/contact', [PortfolioController::class, 'contact'])
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+Route::post('/contact', [ContactFormController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
 
-// Maintenance routes - only available in local environment.
-// In production, run these via artisan CLI on the server.
-if (app()->environment('local')) {
-    Route::get('/storage-link', function () {
-        Artisan::call('storage:link');
-        return 'Storage link created: ' . Artisan::output();
-    })->middleware('auth');
+// Blog - disabled for now, uncomment to enable.
+// Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+// Route::get('/blog/{article:slug}', [BlogController::class, 'show'])->name('blog.show');
 
-    Route::get('/migrate', function () {
-        Artisan::call('migrate', ['--force' => true]);
-        return '<pre>' . Artisan::output() . '</pre>';
-    })->middleware('auth');
-}
+/*
+|--------------------------------------------------------------------------
+| Admin authentication
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -46,51 +50,55 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-    // Content management - admins and editors.
-    Route::middleware('role:admin|editor')->group(function () {
-        Route::get('/admin/dashboard', [PortfolioController::class, 'dashboard'])->name('admin.dashboard');
-        Route::get('/admin/home', [PortfolioController::class, 'homeEdit'])->name('admin.home.edit');
-        Route::put('/admin/home', [PortfolioController::class, 'homeUpdate'])->name('admin.home.update');
+    /*
+    | Content management - admins and editors.
+    */
+    Route::middleware('role:admin|editor')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', DashboardController::class)->name('dashboard');
+        Route::get('/home', [HomeContentController::class, 'edit'])->name('home.edit');
+        Route::put('/home', [HomeContentController::class, 'update'])->name('home.update');
 
-        Route::resource('admin/experiences', ExperienceController::class)
-            ->except(['show'])
-            ->names('admin.experiences');
+        Route::resource('experiences', ExperienceController::class)->except(['show']);
+        Route::resource('projects', ProjectController::class)->except(['show']);
+        Route::resource('articles', AdminArticleController::class)->except(['show']);
 
-        Route::resource('admin/projects', ProjectController::class)
-            ->except(['show'])
-            ->names('admin.projects');
-
-        Route::resource('admin/articles', AdminArticleController::class)
-            ->except(['show'])
-            ->names('admin.articles');
-
-        Route::get('/admin/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
-        Route::post('/admin/contacts/mark-all-read', [ContactController::class, 'markAllRead'])->name('admin.contacts.markAllRead');
-        Route::get('/admin/contacts/{contact}', [ContactController::class, 'show'])->name('admin.contacts.show');
-        Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
+        Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+        Route::post('/contacts/mark-all-read', [ContactController::class, 'markAllRead'])->name('contacts.markAllRead');
+        Route::get('/contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
+        Route::delete('/contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
     });
 
-    // Access control and developer tools - admins only.
-    Route::middleware('role:admin')->group(function () {
-        // Terminal panel - DEVELOPMENT ONLY (executes shell commands).
-        // Disabled in production regardless of auth state.
-        if (app()->environment('local') && config('app.debug')) {
-            Route::get('/terminal-panel', [PortfolioController::class, 'terminalPanel'])->name('terminal.panel');
-            Route::post('/terminal-panel/run', [PortfolioController::class, 'runTerminalCommand'])
+    /*
+    | Access control - admins only.
+    */
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::resource('roles', RoleController::class)->except(['show']);
+        Route::resource('permissions', PermissionController::class)->except(['show']);
+    });
+
+    /*
+    | Developer tools - admins only, and only registered on a local debug install.
+    | On a server, run these through `php artisan` instead.
+    */
+    if (app()->environment('local') && config('app.debug')) {
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/terminal-panel', [TerminalController::class, 'show'])->name('terminal.panel');
+            Route::post('/terminal-panel/run', [TerminalController::class, 'run'])
                 ->middleware('throttle:10,1')
                 ->name('terminal.run');
-        }
 
-        Route::resource('admin/users', UserController::class)
-            ->except(['show'])
-            ->names('admin.users');
+            Route::post('/storage-link', function () {
+                Artisan::call('storage:link');
 
-        Route::resource('admin/roles', RoleController::class)
-            ->except(['show'])
-            ->names('admin.roles');
+                return back()->with('admin_success', trim(Artisan::output()) ?: 'Storage link created.');
+            })->name('dev.storage-link');
 
-        Route::resource('admin/permissions', PermissionController::class)
-            ->except(['show'])
-            ->names('admin.permissions');
-    });
+            Route::post('/migrate', function () {
+                Artisan::call('migrate', ['--force' => true]);
+
+                return back()->with('admin_success', trim(Artisan::output()) ?: 'Migrations ran.');
+            })->name('dev.migrate');
+        });
+    }
 });

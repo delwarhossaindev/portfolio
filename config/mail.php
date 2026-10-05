@@ -128,6 +128,10 @@ return [
     'contact' => [
         'to' => env('CONTACT_MAIL_TO'),
         'cc' => env('CONTACT_MAIL_CC'),
+        // Send the visitor a short "thanks, I got your message" email.
+        'auto_reply' => (bool) env('CONTACT_AUTO_REPLY', true),
+        // Times in emails are shown in this zone (the database stays in UTC).
+        'timezone' => env('CONTACT_TIMEZONE', 'Asia/Dhaka'),
     ],
 
 ];

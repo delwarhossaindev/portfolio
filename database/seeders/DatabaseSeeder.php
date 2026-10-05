@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RolesAndPermissionsSeeder::class);
+        $this->call([RolesAndPermissionsSeeder::class, PortfolioSeeder::class]);
 
         $email = env('ADMIN_EMAIL', 'admin@example.com');
         $password = env('ADMIN_PASSWORD') ?: Str::password(16);

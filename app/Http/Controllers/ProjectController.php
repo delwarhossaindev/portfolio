@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Support\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -133,7 +134,7 @@ class ProjectController extends Controller
             if ($project->cover_image) {
                 Storage::disk('public')->delete($project->cover_image);
             }
-            $project->cover_image = $request->file('cover_image')->store('projects/covers', 'public');
+            $project->cover_image = ImageOptimizer::store($request->file('cover_image'), 'projects/covers', 1600);
         }
 
         $existingImages = $project->images ?? [];
@@ -152,7 +153,7 @@ class ProjectController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
                 if ($file && $file->isValid()) {
-                    $existingImages[] = $file->store('projects/screenshots', 'public');
+                    $existingImages[] = ImageOptimizer::store($file, 'projects/screenshots', 1920);
                 }
             }
         }

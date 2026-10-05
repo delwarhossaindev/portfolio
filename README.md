@@ -225,11 +225,13 @@ php artisan optimize:clear       # refresh caches
 
 Registered only when `APP_ENV=local` (and `APP_DEBUG=true` for the terminal):
 
-| URI | Description |
-| :--- | :--- |
-| `/terminal-panel` | Run whitelisted `artisan` commands from the browser |
-| `/migrate` | Run migrations |
-| `/storage-link` | Create the storage symlink |
+| Method | URI | Description |
+| :---: | :--- | :--- |
+| `GET` | `/terminal-panel` | Run whitelisted `artisan` commands from the browser |
+| `POST` | `/migrate` | Run migrations |
+| `POST` | `/storage-link` | Create the storage symlink |
+
+All three require the `admin` role.
 
 </details>
 

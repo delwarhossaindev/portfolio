@@ -261,10 +261,12 @@
                             </picture>
                         @endif
                         {{-- Floating info badges --}}
-                        <div class="hero-badge hero-badge-1" aria-hidden="true">
-                            <i class="fas fa-briefcase"></i>
-                            <span>5+ Years Exp.</span>
-                        </div>
+                        @if($career['years'] >= 1)
+                            <div class="hero-badge hero-badge-1" aria-hidden="true">
+                                <i class="fas fa-briefcase"></i>
+                                <span>{{ floor($career['years']) }}+ Years Exp.</span>
+                            </div>
+                        @endif
                         <div class="hero-badge hero-badge-2" aria-hidden="true">
                             <i class="fas fa-circle" style="color:#22c55e;font-size:0.6rem;"></i>
                             <span>Available for hire</span>
@@ -289,81 +291,51 @@
             <div class="about-grid fade-in-stagger">
                 <div class="about-content">
                     <h2 class="section-title" id="about-heading">{{ $content->about_title }}</h2>
-                    <p>{!! nl2br(e($content->about_description)) !!}</p>
-                    <p>
-                        I hold a <strong>Bachelor of Science in Computer Science & Engineering</strong> from
-                        <strong>Bangladesh Army International University of Science and Technology (BAIUST)</strong>,
-                        graduated in 2020 with 161 credits.
-                    </p>
-                    <p>
-                        Currently working as a Software Engineer at <strong>ACI Limited</strong>, Dhaka.
-                        Previously contributed to enterprise solutions at MBM Group and Ringer Soft Limited.
-                        My specialization includes <strong>Laravel Framework</strong> and <strong>Vue.js</strong>.
-                    </p>
+                    {{-- Each blank line in the admin text starts a new paragraph. --}}
+                    @foreach(preg_split('/\R{2,}/', trim($content->about_description)) as $paragraph)
+                        <p>{!! nl2br(e($paragraph)) !!}</p>
+                    @endforeach
                     <div class="about-stats">
-                        <div class="stat-item">
-                            <span class="stat-number" data-count="5.7">0</span>
-                            <span class="stat-label">Years Experience</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" data-count="4">0</span>
-                            <span class="stat-label">Companies Worked</span>
-                        </div>
+                        @if($career['years'] > 0)
+                            <div class="stat-item">
+                                <span class="stat-number" data-count="{{ $career['years'] }}">{{ $career['years'] }}</span>
+                                <span class="stat-label">Years Experience</span>
+                            </div>
+                        @endif
+                        @if($career['companies'] > 0)
+                            <div class="stat-item">
+                                <span class="stat-number" data-count="{{ $career['companies'] }}">{{ $career['companies'] }}</span>
+                                <span class="stat-label">{{ \Illuminate\Support\Str::plural('Company', $career['companies']) }}</span>
+                            </div>
+                        @endif
+                        @if($projects->count() > 0)
+                            <div class="stat-item">
+                                <span class="stat-number" data-count="{{ $projects->count() }}">{{ $projects->count() }}</span>
+                                <span class="stat-label">{{ \Illuminate\Support\Str::plural('Project', $projects->count()) }}</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="tech-stack">
                     <h2 class="section-title" id="tech-heading">Tech Stack</h2>
-                    <div class="tech-grid fade-in-stagger" aria-labelledby="tech-heading">
-                        {{-- Frontend --}}
-                        <div class="tech-icon" title="HTML5">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" loading="lazy" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="CSS3">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="JavaScript">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="Vue.js">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg" alt="Vue.js" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="jQuery">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jquery/jquery-original.svg" alt="jQuery" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="Bootstrap">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" alt="Bootstrap" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        {{-- Backend --}}
-                        <div class="tech-icon" title="PHP">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="Laravel">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="Java">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        {{-- Database --}}
-                        <div class="tech-icon" title="MySQL">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="Oracle">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        {{-- Tools --}}
-                        <div class="tech-icon" title="Git">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="GitHub">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="Trello">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/trello/trello-plain.svg" alt="Trello" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                        <div class="tech-icon" title="VS Code">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" loading="lazy" decoding="async" width="36" height="36">
-                        </div>
-                    </div>
+                    @php
+                        // [name, devicon slug, variant]
+                        $techStack = [
+                            ['HTML5', 'html5', 'original'], ['CSS3', 'css3', 'original'], ['JavaScript', 'javascript', 'original'],
+                            ['Vue.js', 'vuejs', 'original'], ['jQuery', 'jquery', 'original'], ['Bootstrap', 'bootstrap', 'original'],
+                            ['PHP', 'php', 'original'], ['Laravel', 'laravel', 'original'], ['Java', 'java', 'original'],
+                            ['MySQL', 'mysql', 'original'], ['Oracle', 'oracle', 'original'], ['Git', 'git', 'original'],
+                            ['GitHub', 'github', 'original'], ['Trello', 'trello', 'plain'], ['VS Code', 'vscode', 'original'],
+                        ];
+                    @endphp
+                    <ul class="tech-grid fade-in-stagger" aria-labelledby="tech-heading">
+                        @foreach($techStack as [$name, $slug, $variant])
+                            <li class="tech-icon">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/{{ $slug }}/{{ $slug }}-{{ $variant }}.svg" alt="" data-tech="{{ $slug }}" loading="lazy" decoding="async" width="36" height="36">
+                                <span class="tech-name">{{ $name }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         </div>
@@ -387,7 +359,7 @@
                                 <span class="timeline-location"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ $exp->location }}</span>
                             @endif
                             @if($exp->date_range)
-                                <span class="timeline-date">{{ $exp->date_range }}</span>
+                                <span class="timeline-date">{{ $exp->displayDateRange() }}</span>
                             @endif
                             @if($exp->description)
                                 <p>{{ $exp->description }}</p>
